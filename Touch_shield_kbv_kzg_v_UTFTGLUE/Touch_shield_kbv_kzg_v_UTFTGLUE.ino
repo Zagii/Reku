@@ -8,39 +8,51 @@
 #include "CLcd.h"
 CLcd lcd;
 
+#define PIN_WIATRAK_CZERPNIA 46
+#define PIN_TACHO_WIATRAK_CZERPNIA 19
+#define PIN_WIATRAK_WYWIEW 45
+#define PIN_TACHO_WIATRAK_WYWIEW 20
 
+volatile int tachoWiatrakCzerpniaIle=0;
+uint8_t tachoWiatrakCzerpniaIle_pop=0;
+unsigned long czas=0;
 
 void setup(void)
 {
    Serial.begin(9600);
    lcd.begin();
    lcd.show_Serial();
-   pinMode(46, OUTPUT);
-   analogWrite(46,50);
-   attachInterrupt(digitalPinToInterrupt(19), tacho19, RISING );
+   pinMode(PIN_WIATRAK_CZERPNIA, OUTPUT);
+   
+   attachInterrupt(digitalPinToInterrupt(PIN_TACHO_WIATRAK_CZERPNIA), tachoWiatrakCzerpnia, RISING );
+   attachInterrupt(digitalPinToInterrupt(PIN_TACHO_WIATRAK_WYWIEW), tachoWiatrakWywiew, RISING );
 }
 
-volatile int tacho19cnt=0;
-int poptacho=0;
-unsigned long ta=0;
-void tacho19()
+
+void tachoWiatrakCzerpnia()
 {
-  tacho19cnt++;
-  
+  tachoWiatrakCzerpniaIle++;  
+}
+volatile int tachoWiatrakWywiewIle=0;
+uint8_t tachoWiatrakWywiewIle_pop=0;
+
+void tachoWiatrakWywiew()
+{
+  tachoWiatrakWywiewIle++;  
 }
 void loop()
 {
-  if(millis()-ta>1000)
-  {
-ta=millis();
-Serial.println(tacho19cnt);
-poptacho=tacho19cnt;
-tacho19cnt=0;
-    }
+	if(millis()-czas>1000)
+	{
+		czas=millis();
+		Serial.println(tachoWiatrakCzerpniaIle);
+		tachoWiatrakCzerpniaIle_pop=tachoWiatrakCzerpniaIle;
+		tachoWiatrakCzerpniaIle=0;
+		tachoWiatrakCzerpniaIle_pop=tachoWiatrakCzerpniaIle;
+		tachoWiatrakCzerpniaIle=0;
+	}
+	lcd.loop(tachoWiatrakCzerpniaIle_pop);
 
-lcd.loop(poptacho);
-
-//delay(1000);
 }
 
 
