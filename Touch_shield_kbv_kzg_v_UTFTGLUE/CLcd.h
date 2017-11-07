@@ -101,7 +101,7 @@ uint8_t showBMP(char *nm, int x, int y);
   void initGUI();
   void show_tft();
   void stary_loop();
-  void loop(int tacho19cnt);
+  uint8_t loop( CWiatrak [] Wiatraki, CKomora [] Komory);//return czy jest rozkaz od uzytkownika lcd?
   void show_Serial(void);
 
   void RysujMenuDol();

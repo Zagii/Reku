@@ -136,10 +136,10 @@ bminus.zmienStan(0);
   
  }
 
- void CLcd::loop(int tacho19cnt)
+ uint8_t CLcd::loop(int tacho19cnt)
  {
   uint8_t odswiez=0;
- 
+  uint8_t ret=0;
   if(touch()==1)// byl touch
   {String s=String(tacho19cnt*60,DEC);
       String s2;
@@ -208,6 +208,7 @@ bminus.zmienStan(0);
       break;
     }
   }
+  return ret;
  }
 
  int CLcd::touch()
