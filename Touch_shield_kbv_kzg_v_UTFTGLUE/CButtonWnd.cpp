@@ -82,19 +82,61 @@ void CButtonWnd:: Rysuj()//( MCUFRIEND_kbv* tft )
 		return;
 	}  
 }
-int CButtonWnd::czyKlik(uint16_t x,uint16_t y)
+/**
+* Zwracany jest stan klikniecia 0-4 lub jesli jest wciskany i trzymany to czas wcisniecia w ms
+*
+*/
+
+ unsigned long  CButtonWnd::czyKlik(uint16_t x,uint16_t y)
 {
-	if(x>_x&&x<_x+_w&&y>_y&&y<_y+_h)
+	unsigned long ret=0;
+	bool klik_wew=false;
+	if(x>_x&&x<_x+_w&&y>_y&&y<_y+_h)klik_wew=true;
+	
+	switch(_klik)
 	{
+		case KLIK_PUSZCZONY: //wykrycie dotknięcia butona
+			if(klik_wew)
+			{
+				_ms=millis();
+				_klik=KLIK_WCISKANY;
+			}
+			
+		break;
+		case KLIK_WCISKANY: // wcisniecie butona
+			if(klik_wew) //jesli nadal jest trzymany
+			{
+				if(millis()-_ms>30) //po tym czasie uznaj ze guzik jest trzymany
+				{
+					_klik=KLIK_WCISNIETY;
+				}
+			}else
+			{
+				_klik=KLIK_PUSZCZANY;
+			}
+		break;
+		case KLIK_WCISNIETY: //wcisniecie i trzymanie butona
+			if(klik_wew) //jesli nadal jest trzymany
+			{
+				ret=millis()-ms;								
+			}else
+			{
+				_klik=KLIK_PUSZCZANY;
+			}
+		break;
+		case KLIK_PUSZCZANY:
+			_klik=KLIK_PUSZCZONY;
+		break;
+	}
+	
 		Serial.print("#");Serial.print(_id);
 		Serial.print(" czyKlik "); Serial.print(x);
 		Serial.print(", "); Serial.println(y);
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
+	
+		if(ret>0)return ret;
+		else return _klik;
+	
+	
 }
 void CButtonWnd::zmienStan(uint8_t stan)
 {

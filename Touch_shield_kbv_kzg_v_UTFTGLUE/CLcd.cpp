@@ -456,3 +456,82 @@ uint8_t CLcd::showBMP(char *nm, int x, int y)
     return (ret);
 }
 
+//=========================================================
+     void CLcd::drawMidpointCircle(uint16_t cx,uint16_t cy,uint16_t radius,uint16_t startAngle, uint16_t endangle)  {
+        // Settings
+        /*int startAngle = 1;
+        int endangle = 360;
+        int cx = 150;  // x axis value for the center of the circle
+        int cy = 150;  // y axis value for the center of the circle
+        int radius = 50;
+		http://eduinf.waw.pl/inf/utils/002_roz/2008_23.php
+*/
+        // Standard Midpoint Circle algorithm
+        uint16_t p = (5 - radius * 4) / 4;
+        uint16_t x = 0;
+        uint16_t y = radius;
+
+        drawCirclePoints( cx, cy, x, 20, 1, 360);
+
+        while (x <= y) {
+            x++;
+            if (p < 0) {
+                p += 2 * x + 1;
+            } else {
+                y--;
+                p += 2 * (x - y) + 1;
+            }
+            drawCirclePoints( cx, cy, x, y, startAngle, endangle);
+        }
+    }
+
+    void CLcd::drawCirclePoints( uint16_t centerX, uint16_t centerY, uint16_t x, uint16_t y, uint16_t startAngle, uint16_t endAngle) 
+	{
+
+        // Calculate the angle the current point makes with the circle center
+        uint16_t angle = (uint16_t) toDegrees(atan2(y, x));
+		uint16_t kolor=0xffffff;
+        // draw the circle points as long as they lie in the range specified
+        if (x < y) {
+            // draw point in range 0 to 45 degrees
+            if (90 - angle >= startAngle && 90 - angle <= endAngle) {
+                tft.drawPixel( centerX - y, centerY - x,kolor);
+            }
+
+            // draw point in range 45 to 90 degrees
+            if (angle >= startAngle && angle <= endAngle) {
+                tft.drawPixel( centerX - x, centerY - y,kolor);
+            }
+
+            // draw point in range 90 to 135 degrees
+            if (180 - angle >= startAngle && 180 - angle <= endAngle) {
+                tft.drawPixel( centerX + x, centerY - y,kolor);
+            }
+
+            // draw point in range 135 to 180 degrees
+            if (angle + 90 >= startAngle && angle + 90 <= endAngle) {
+                tft.drawPixel( centerX + y, centerY - x,kolor);
+            }
+
+            // draw point in range 180 to 225 degrees
+            if (270 - angle >= startAngle && 270 - angle <= endAngle) {
+                tft.drawPixel( centerX + y, centerY + x,kolor);
+            }
+
+            // draw point in range 225 to 270 degrees
+            if (angle + 180 >= startAngle && angle + 180 <= endAngle) {
+                tft.drawPixel( centerX + x, centerY + y,kolor);
+            }
+
+            // draw point in range 270 to 315 degrees
+            if (360 - angle >= startAngle && 360 - angle <= endAngle) {
+                tft.drawPixel( centerX - x, centerY + y,kolor);
+            }
+
+            // draw point in range 315 to 360 degrees
+            if (angle + 270 >= startAngle && angle + 270 <= endAngle) {
+                tft.drawPixel( centerX - y, centerY + x,kolor);
+            }
+        }
+    }
+//=========================================================

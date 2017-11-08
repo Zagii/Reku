@@ -15,6 +15,12 @@
 #define TYP_TEXT 1
 #define TYP_BMP 2
 
+#define KLIK_PUSZCZONY 0
+#define KLIK_WCISKANY 1
+#define KLIK_WCISNIETY 2
+#define KLIK_PUSZCZANY 3
+
+
 class CButtonWnd
 {
   uint8_t _id;
@@ -29,13 +35,15 @@ class CButtonWnd
   uint16_t *_bmpAktywWybr;
   uint8_t _typ;
   char _txt[10];
+  unsigned long _ms=0;
+  uint8_t _klik=KLIK_PUSZCZONY;
  UTFTGLUE* _tft;
   public:
     CButtonWnd(){_typ=TYP_UNDF;_id=0;};
     CButtonWnd(UTFTGLUE* tft,  uint8_t id, uint16_t x, uint16_t y, uint16_t w, uint16_t h,char *txt);
 	  CButtonWnd(UTFTGLUE* tft,  uint8_t id, uint16_t x, uint16_t y, uint16_t w, uint16_t h,uint16_t *bmpAktyw,uint16_t *bmpAktywWybr);
     void Rysuj();
-    int czyKlik(uint16_t x,uint16_t y);
+     unsigned long  czyKlik(uint16_t x,uint16_t y);
     void zmienStan(uint8_t stan);
 };
 
