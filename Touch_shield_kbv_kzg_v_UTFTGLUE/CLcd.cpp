@@ -118,30 +118,66 @@ void CLcd::show_Serial(void)
 void CLcd::initGUI()
 {
   
-b1=CButtonWnd(&tft,250,150,70,40,"Czyste");
+b1=CButtonWnd( &tft,0,250,150,70,40,"Czyste");
 
-b2=CButtonWnd(&tft,250,100,70,40,"Rysowanie");
-bplus=CButtonWnd(&tft,180,100,40,40,"Plus");
-bminus=CButtonWnd(&tft,250,100,40,40,"Minus");
+b2=CButtonWnd(&tft,1,250,100,70,40,"Rysowanie");
+bplus=CButtonWnd(&tft,2,180,100,40,40,"Plus");
+bminus=CButtonWnd(&tft,3,250,100,40,40,"Minus");
 stary_loop();
-b1.zmienStan(0);
-b2.zmienStan(1);
+bInfo=CButtonWnd(&tft,4,15,190,45,45,infoBiale,infoZolte);
+bDashboard=CButtonWnd(&tft,5,80,190,45,45,dashboardBiale,dashboardZolte);
+bDebug=CButtonWnd(&tft,6,145,190,45,45,mechanicBiale,mechanicZolte);
+zmienEkran(EKRAN_INFO);
+ }
+       
+  void CLcd::loopDyn()
+  {
+   }
+   void CLcd::loopStat()
+   {
 
-bplus.zmienStan(0);
-bminus.zmienStan(0);
-
+    }
+ void CLcd::zmienEkran(uint8_t e)
+ {
+  ekran=e;
+ // tft.clrScr();
+  RysujMenuDol();
  }
  void CLcd::  RysujMenuDol()
  {
-  
+  tft.setColor(0x000000);
+  tft.drawLine(0,25,320,25);//<<<<<<<<<<<<<<<<<<<<<<,,gora
+  //tft.fillRect(0,190,320,240);
+  tft.setColor(255, 0, 0);
+  tft.drawLine(0,185,320,185);
+        
+  switch(ekran)
+  {
+    case EKRAN_INFO:
+      bInfo.zmienStan(STAN_AKTYWNY_WYBRANY);
+      bDashboard.zmienStan(STAN_AKTYWNY);
+      bDebug.zmienStan(STAN_AKTYWNY);
+    break;
+    case EKRAN_DASHBOARD:
+      bInfo.zmienStan(STAN_AKTYWNY);
+      bDashboard.zmienStan(STAN_AKTYWNY_WYBRANY);
+      bDebug.zmienStan(STAN_AKTYWNY);
+    break;
+    case EKRAN_DEBUG:
+      bInfo.zmienStan(STAN_AKTYWNY);
+      bDashboard.zmienStan(STAN_AKTYWNY);
+      bDebug.zmienStan(STAN_AKTYWNY_WYBRANY);
+    break;
+   }
  }
 
- uint8_t CLcd::loop(int tacho19cnt)
+ uint8_t CLcd::loop(CWiatrak Wiatraki[], CKomora Komory[])
  {
   uint8_t odswiez=0;
   uint8_t ret=0;
   if(touch()==1)// byl touch
-  {String s=String(tacho19cnt*60,DEC);
+  {
+     String s=String(100,DEC);
       String s2;
       String s3;
     switch(ekran)
@@ -176,6 +212,42 @@ bminus.zmienStan(0);
       break;
       case ekran_prosty:
       break;
+    case EKRAN_INFO:
+      if(bDashboard.czyKlik(xpos,ypos))
+      {
+        zmienEkran(EKRAN_DASHBOARD);
+        odswiez=1;
+       }
+      if(bDebug.czyKlik(xpos,ypos))
+      {
+      zmienEkran(EKRAN_DEBUG);
+        odswiez=1;
+       }
+    break;
+    case EKRAN_DASHBOARD:
+       if(bInfo.czyKlik(xpos,ypos))
+      {
+        zmienEkran(EKRAN_INFO);
+        odswiez=1;
+       }
+      if(bDebug.czyKlik(xpos,ypos))
+      {
+        zmienEkran(EKRAN_DEBUG);
+        odswiez=1;
+       }
+    break;
+    case EKRAN_DEBUG:
+       if(bDashboard.czyKlik(xpos,ypos))
+      {
+        zmienEkran(EKRAN_DASHBOARD);
+        odswiez=1;
+       }
+      if(bInfo.czyKlik(xpos,ypos))
+      {
+        zmienEkran(EKRAN_INFO);
+        odswiez=1;
+       }
+    break;
     }
   }
   if(odswiez==2){b1.zmienStan(1);
@@ -190,18 +262,12 @@ bminus.zmienStan(0);
  
       break;
       case ekran_debug:
-         b1.zmienStan(1);
-          b2.zmienStan(0);
-        tft.clrScr();
-        tft.setColor(255, 0, 0);
-        tft.drawLine(0,25,320,25);
-        tft.drawLine(0,185,320,185);
-        
-        tft.drawBitmap(15,190,45,45,infoBiale);
-        tft.drawBitmap(80,190,45,45,dashboardBiale);
-        tft.drawBitmap(145,190,45,45,mechanicZolte);
-       bplus.Rysuj();
-       bminus.Rysuj();
+      //   b1.zmienStan(1);
+       //   b2.zmienStan(0);
+       
+    //   bplus.Rysuj();
+    //   bminus.Rysuj();
+    zmienEkran(EKRAN_INFO);
       break;
       case ekran_prosty:
       

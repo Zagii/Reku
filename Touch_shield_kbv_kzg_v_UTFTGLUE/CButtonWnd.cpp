@@ -1,7 +1,7 @@
 
 #include "CButtonWnd.h"
 
-CButtonWnd::CButtonWnd(UTFTGLUE* tft,  uint8_t _id, uint16_t x, uint16_t y, uint16_t w, uint16_t h,char *txt)
+CButtonWnd::CButtonWnd(UTFTGLUE* tft,  uint8_t id, uint16_t x, uint16_t y, uint16_t w, uint16_t h,char *txt)
 {
  _id=id;
   _x=x;
@@ -13,9 +13,9 @@ CButtonWnd::CButtonWnd(UTFTGLUE* tft,  uint8_t _id, uint16_t x, uint16_t y, uint
   strcpy(_txt,txt);
   _stan=STAN_AKTYWNY;
   _tft=tft;
-
+  _typ=TYP_TEXT;
 }
-CButtonWnd(UTFTGLUE* tft,  uint8_t _id, uint16_t x, uint16_t y, uint16_t w, uint16_t h,uint16_t *bmpAktyw,uint16_t *bmpAktywWybr)
+CButtonWnd::CButtonWnd(UTFTGLUE* tft,  uint8_t id, uint16_t x, uint16_t y, uint16_t w, uint16_t h,uint16_t *bmpAktyw,uint16_t *bmpAktywWybr)
 {
   _id=id;
   _x=x;
@@ -29,6 +29,7 @@ CButtonWnd(UTFTGLUE* tft,  uint8_t _id, uint16_t x, uint16_t y, uint16_t w, uint
   _tft=tft;
   _bmpAktyw=bmpAktyw;
   _bmpAktywWybr=bmpAktywWybr;
+  _typ=TYP_BMP;
 }
 void CButtonWnd:: Rysuj()//( MCUFRIEND_kbv* tft )
 {

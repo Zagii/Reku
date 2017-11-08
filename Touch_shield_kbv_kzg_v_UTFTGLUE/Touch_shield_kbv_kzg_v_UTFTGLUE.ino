@@ -25,20 +25,12 @@
 #define WIATRAKI_SZT 2
 
 CLcd lcd;
-//CWiatrak wiatrakIN(PIN_WIATRAK_CZERPNIA,PIN_TACHO_WIATRAK_CZERPNIA);
-//CWiatrak wiatrakOUT(PIN_WIATRAK_WYWIEW,PIN_TACHO_WIATRAK_WYWIEW);
 CKomora komory[KOMORA_SZT];
 CWiatrak wiatraki[WIATRAKI_SZT]=
 {
 	CWiatrak(PIN_WIATRAK_CZERPNIA,PIN_TACHO_WIATRAK_CZERPNIA),
 	CWiatrak(PIN_WIATRAK_WYWIEW,PIN_TACHO_WIATRAK_WYWIEW)
 };
-
-
-
-//volatile int tachoWiatrakCzerpniaIle=0;
-//uint8_t tachoWiatrakCzerpniaIle_pop=0;
-//unsigned long czas=0;
 
 void setup(void)
 {
@@ -51,40 +43,22 @@ void setup(void)
 	   komory[i]=CKomora();
 	   komory[i].begin();
    }
+   attachInterrupt(digitalPinToInterrupt( wiatraki[WIATRAK_IN].dajISR()), isrIN, RISING );
+   attachInterrupt(digitalPinToInterrupt( wiatraki[WIATRAK_OUT].dajISR()), isrOUT, RISING );
    wiatraki[WIATRAK_IN].begin();
    wiatraki[WIATRAK_OUT].begin();
-   
-   
-   
-//   pinMode(PIN_WIATRAK_CZERPNIA, OUTPUT);
-   
- //  attachInterrupt(digitalPinToInterrupt(PIN_TACHO_WIATRAK_CZERPNIA), tachoWiatrakCzerpnia, RISING );
- //  attachInterrupt(digitalPinToInterrupt(PIN_TACHO_WIATRAK_WYWIEW), tachoWiatrakWywiew, RISING );
+}
+void isrIN()
+{
+  wiatraki[WIATRAK_IN].obslugaTachoISR();
+}
+void isrOUT()
+{
+  wiatraki[WIATRAK_OUT].obslugaTachoISR();
 }
 
-/*
-void tachoWiatrakCzerpnia()
-{
-  tachoWiatrakCzerpniaIle++;  
-}
-volatile int tachoWiatrakWywiewIle=0;
-uint8_t tachoWiatrakWywiewIle_pop=0;
-
-void tachoWiatrakWywiew()
-{
-  tachoWiatrakWywiewIle++;  
-}*/
 void loop()
-{/*
-	if(millis()-czas>1000)
-	{
-		czas=millis();
-		Serial.println(tachoWiatrakCzerpniaIle);
-		tachoWiatrakCzerpniaIle_pop=tachoWiatrakCzerpniaIle;
-		tachoWiatrakCzerpniaIle=0;
-		tachoWiatrakCzerpniaIle_pop=tachoWiatrakCzerpniaIle;
-		tachoWiatrakCzerpniaIle=0;
-	}*/
+{
 	for(uint8_t i=0;i<KOMORA_SZT;i++)
     {
 		komory[i].loop();

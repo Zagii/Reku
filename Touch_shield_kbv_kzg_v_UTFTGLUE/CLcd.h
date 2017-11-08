@@ -11,6 +11,8 @@
 #include <MCUFRIEND_kbv.h>
 #include <UTFTGLUE.h>              // class methods are in here
 #include "CButtonWnd.h"
+#include "CWiatrak.h"
+#include "CKomora.h"
 
 // Declare which fonts we will be using
 #if !defined(SmallFont)
@@ -47,6 +49,9 @@ extern uint8_t SmallFont[];    //.kbv GLUE defines as GFXFont ref
 #define ekran_test 0
 #define ekran_debug 1
 #define ekran_prosty 2
+#define EKRAN_INFO 3
+#define EKRAN_DASHBOARD 4
+#define EKRAN_DEBUG 5
 
  
 #define BMPIMAGEOFFSET 54
@@ -92,6 +97,9 @@ CButtonWnd b1;
 CButtonWnd b2;
 CButtonWnd bplus;
 CButtonWnd bminus;
+CButtonWnd bInfo;
+CButtonWnd bDashboard;
+CButtonWnd bDebug;
 uint16_t read16(File& f);
 uint32_t read32(File& f);
 uint8_t showBMP(char *nm, int x, int y);
@@ -100,13 +108,16 @@ uint8_t showBMP(char *nm, int x, int y);
   void begin();
   void initGUI();
   void show_tft();
+  void loopDyn();
+  void loopStat();
   void stary_loop();
-  uint8_t loop( CWiatrak [] Wiatraki, CKomora [] Komory);//return czy jest rozkaz od uzytkownika lcd?
+  uint8_t loop( CWiatrak Wiatraki[], CKomora Komory[]);//return czy jest rozkaz od uzytkownika lcd?
   void show_Serial(void);
 
   void RysujMenuDol();
  
   int touch();
+  void zmienEkran(uint8_t e);
 
 };
 
