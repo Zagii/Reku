@@ -50,12 +50,12 @@ class CWentGUI
   unsigned long _ms=0;
   uint8_t _tryb=CWentGUI_PWM_stop;
  // uint8_t _klik=KLIK_PUSZCZONY;
-  UTFTGLUE* _tft;
+
   CLcd *_lcd;
   public:
    CWentGUI(){};
-   CWentGUI(UTFTGLUE* tft,   uint16_t x, uint16_t y);
-   void begin(CLcd *lcd);
+   CWentGUI(CLcd *lcd,  uint16_t x, uint16_t y);
+   void begin();
    void Rysuj(uint8_t pwmNawiew,uint8_t pwmWywiew,uint8_t tryb);
    uint16_t  czyKlik(uint16_t x,uint16_t y);
    void zmienStan(uint8_t stan);

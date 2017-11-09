@@ -1,5 +1,5 @@
 #include "CLcd.h"
- UTFTGLUE tft(0x0154,A2,A1,A3,A4,A0);
+ 
  SdFatSoftSpi<12, 11, 13> SD; //Bit-Bang SD_SPI_CONFIGURATION==3
 extern  uint16_t  dashboardZolte[];
 extern  uint16_t  dashboardBiale[];
@@ -24,12 +24,12 @@ void CLcd::begin()
    
     ts = TouchScreen(XP, YP, XM, YM, 300);     //call the constructor AGAIN with new values.
 
-   tft.InitLCD(3);
-   tft.setFont(SmallFont);
-   tft.clrScr();
+   InitLCD(3);
+   setFont(SmallFont);
+   clrScr();
     show_tft();
 
-    BOXSIZE = tft.width() / 6;
+    BOXSIZE = width() / 6;
    
    
      bool good = SD.begin(SD_CS);
@@ -55,47 +55,47 @@ void CLcd::begin()
 
             if (xpos < BOXSIZE) {
                 currentcolor = RED;
-                tft.setColor(WHITE);
-                tft.drawRect(0, 0, BOXSIZE, BOXSIZE);
+                setColor(WHITE);
+                drawRect(0, 0, BOXSIZE, BOXSIZE);
             } else if (xpos < BOXSIZE * 2) {
                 currentcolor = YELLOW;
-                tft.drawRect(BOXSIZE, 0, 2*BOXSIZE, BOXSIZE);
+                drawRect(BOXSIZE, 0, 2*BOXSIZE, BOXSIZE);
             } else if (xpos < BOXSIZE * 3) {
                 currentcolor = GREEN;
-                tft.drawRect(BOXSIZE * 2, 0, 3*BOXSIZE, BOXSIZE);
+                drawRect(BOXSIZE * 2, 0, 3*BOXSIZE, BOXSIZE);
             } else if (xpos < BOXSIZE * 4) {
                 currentcolor = CYAN;
-                tft.drawRect(BOXSIZE * 3, 0, 4*BOXSIZE, BOXSIZE);
+                drawRect(BOXSIZE * 3, 0, 4*BOXSIZE, BOXSIZE);
             } else if (xpos < BOXSIZE * 5) {
                 currentcolor = BLUE;
-                tft.drawRect(BOXSIZE * 4, 0, 5*BOXSIZE, BOXSIZE);
+                drawRect(BOXSIZE * 4, 0, 5*BOXSIZE, BOXSIZE);
             } else if (xpos < BOXSIZE * 6) {
                 currentcolor = MAGENTA;
-                tft.drawRect(BOXSIZE * 5, 0, 6*BOXSIZE, BOXSIZE);
+                drawRect(BOXSIZE * 5, 0, 6*BOXSIZE, BOXSIZE);
             }
 
             if (oldcolor != currentcolor) { //rub out the previous white border
-                if (oldcolor == RED) { tft.setColor(RED);tft.fillRect(0, 0, BOXSIZE, BOXSIZE );}
-                if (oldcolor == YELLOW){ tft.setColor(YELLOW); tft.fillRect(BOXSIZE, 0, 2*BOXSIZE, BOXSIZE );}
-                if (oldcolor == GREEN) { tft.setColor(GREEN);tft.fillRect(BOXSIZE * 2, 0, 3*BOXSIZE, BOXSIZE );}
-                if (oldcolor == CYAN) { tft.setColor(CYAN);tft.fillRect(BOXSIZE * 3, 0, 4*BOXSIZE, BOXSIZE );}
-                if (oldcolor == BLUE){ tft.setColor(BLUE); tft.fillRect(BOXSIZE * 4, 0, 5*BOXSIZE, BOXSIZE );}
-                if (oldcolor == MAGENTA) { tft.setColor(MAGENTA);tft.fillRect(BOXSIZE * 5, 0, 6*BOXSIZE, BOXSIZE );}
+                if (oldcolor == RED) { setColor(RED);fillRect(0, 0, BOXSIZE, BOXSIZE );}
+                if (oldcolor == YELLOW){ setColor(YELLOW); fillRect(BOXSIZE, 0, 2*BOXSIZE, BOXSIZE );}
+                if (oldcolor == GREEN) { setColor(GREEN);fillRect(BOXSIZE * 2, 0, 3*BOXSIZE, BOXSIZE );}
+                if (oldcolor == CYAN) { setColor(CYAN);fillRect(BOXSIZE * 3, 0, 4*BOXSIZE, BOXSIZE );}
+                if (oldcolor == BLUE){ setColor(BLUE); fillRect(BOXSIZE * 4, 0, 5*BOXSIZE, BOXSIZE );}
+                if (oldcolor == MAGENTA) { setColor(MAGENTA);fillRect(BOXSIZE * 5, 0, 6*BOXSIZE, BOXSIZE );}
             }
         }
         // are we in drawing area ?
         if (((ypos - PENRADIUS) > BOXSIZE) && ((ypos + PENRADIUS) <TFT_H)) {
-           tft.setColor(currentcolor);
-            tft.fillCircle(xpos, ypos, PENRADIUS);
+           setColor(currentcolor);
+            fillCircle(xpos, ypos, PENRADIUS);
         }
         // are we in erase area ?
         if (ypos > TFT_H - 15) {
             // press the bottom of the screen to erase
-              tft.setColor(BLACK);
-            tft.fillRect(0, BOXSIZE, TFT_W, TFT_H );
+             setColor(BLACK);
+            fillRect(0, BOXSIZE, TFT_W, TFT_H );
         }
-        tft.setColor(0xdddddd);
-    tft.fillRect(0, TFT_H - 15, TFT_W, TFT_H );
+        setColor(0xdddddd);
+    fillRect(0, TFT_H - 15, TFT_W, TFT_H );
     
 }
 void CLcd::show_Serial(void)
@@ -118,16 +118,14 @@ void CLcd::show_Serial(void)
 void CLcd::initGUI()
 {
   
-b1=CButtonWnd( &tft,0,250,150,70,40,"Czyste");
+b1=CButtonWnd( this,0,250,150,70,40,"Czyste");
 
-b2=CButtonWnd(&tft,1,250,100,70,40,"Rysowanie");
-bplus=CButtonWnd(&tft,2,180,100,40,40,"Plus");
-bminus=CButtonWnd(&tft,3,250,100,40,40,"Minus");
+b2=CButtonWnd(this,1,250,100,70,40,"Rysowanie");
+bplus=CButtonWnd(this,2,180,100,40,40,"Plus");
+bminus=CButtonWnd(this,3,250,100,40,40,"Minus");
 stary_loop();
-bInfo=CButtonWnd(&tft,4,15,190,45,45,infoBiale,infoZolte);
-bDashboard=CButtonWnd(&tft,5,80,190,45,45,dashboardBiale,dashboardZolte);
-bDebug=CButtonWnd(&tft,6,145,190,45,45,mechanicBiale,mechanicZolte);
-_wentWnd= new CWentGUI(&tft,   190, 40);
+
+_wentWnd= new CWentGUI(this,   190, 40);
 _wentWnd->begin(this);
 zmienEkran(EKRAN_INFO);
  }
@@ -147,11 +145,11 @@ zmienEkran(EKRAN_INFO);
  }
  void CLcd::  RysujMenuDol()
  {
-  tft.setColor(0x000000);
-  tft.drawLine(0,25,320,25);//<<<<<<<<<<<<<<<<<<<<<<,,gora
+  setColor(0x000000);
+  drawLine(0,25,320,25);//<<<<<<<<<<<<<<<<<<<<<<,,gora
   //tft.fillRect(0,190,320,240);
-  tft.setColor(255, 0, 0);
-  tft.drawLine(0,185,320,185);
+  setColor(255, 0, 0);
+  drawLine(0,185,320,185);
         
   switch(ekran)
   {
@@ -205,10 +203,10 @@ zmienEkran(EKRAN_INFO);
       }
       s2=String(10*aw/25);
       s3= s +" rpm, pwm="+s2+" %";
-      tft.setColor(0,0,0);
-      tft.fillRect(15,90,150,130);
-      tft.setTextColor(0xffffff);
-      tft.print(s3.c_str(),20,100);
+      setColor(0,0,0);
+      fillRect(15,90,150,130);
+      setTextColor(0xffffff);
+      print(s3.c_str(),20,100);
      _wentWnd->Rysuj( 50,80,0);
       Serial.println(s3);
       break;
@@ -388,7 +386,7 @@ uint8_t CLcd::showBMP(char *nm, int x, int y)
         }
 
         // Set TFT address window to clipped image bounds
-        tft.setAddrWindow(x, y, x + w - 1, y + h - 1);
+        setAddrWindow(x, y, x + w - 1, y + h - 1);
         for (row = 0; row < h; row++) { // For each scanline...
             // Seek to start of scan line.  It might seem labor-
             // intensive to be doing this on every line, but this
@@ -451,7 +449,7 @@ uint8_t CLcd::showBMP(char *nm, int x, int y)
                 col += lcdidx;
             }           // end cols
         }               // end rows
-        tft.setAddrWindow(0, 0, tft.width() - 1, tft.height() - 1); //restore full screen
+        setAddrWindow(0, 0, width() - 1, height() - 1); //restore full screen
         ret = 0;        // good render
     }
     bmpFile.close();
@@ -493,47 +491,47 @@ uint8_t CLcd::showBMP(char *nm, int x, int y)
         // Calculate the angle the current point makes with the circle center
         uint16_t rad=atan2(y, x);
         uint16_t angle = (uint16_t)(rad * 4068) / 71; 
-		tft.setColor(255,255,255);
+		setColor(255,255,255);
         // draw the circle points as long as they lie in the range specified
         if (x < y) {
             // draw point in range 0 to 45 degrees
             if (90 - angle >= startAngle && 90 - angle <= endAngle) {
-                tft.drawPixel( centerX - y, centerY - x);
+                drawPixel( centerX - y, centerY - x);
             }
 
             // draw point in range 45 to 90 degrees
             if (angle >= startAngle && angle <= endAngle) {
-                tft.drawPixel( centerX - x, centerY - y);
+               drawPixel( centerX - x, centerY - y);
             }
 
             // draw point in range 90 to 135 degrees
             if (180 - angle >= startAngle && 180 - angle <= endAngle) {
-                tft.drawPixel( centerX + x, centerY - y);
+                drawPixel( centerX + x, centerY - y);
             }
 
             // draw point in range 135 to 180 degrees
             if (angle + 90 >= startAngle && angle + 90 <= endAngle) {
-                tft.drawPixel( centerX + y, centerY - x);
+                drawPixel( centerX + y, centerY - x);
             }
 
             // draw point in range 180 to 225 degrees
             if (270 - angle >= startAngle && 270 - angle <= endAngle) {
-                tft.drawPixel( centerX + y, centerY + x);
+               drawPixel( centerX + y, centerY + x);
             }
 
             // draw point in range 225 to 270 degrees
             if (angle + 180 >= startAngle && angle + 180 <= endAngle) {
-                tft.drawPixel( centerX + x, centerY + y);
+                drawPixel( centerX + x, centerY + y);
             }
 
             // draw point in range 270 to 315 degrees
             if (360 - angle >= startAngle && 360 - angle <= endAngle) {
-                tft.drawPixel( centerX - x, centerY + y);
+                drawPixel( centerX - x, centerY + y);
             }
 
             // draw point in range 315 to 360 degrees
             if (angle + 270 >= startAngle && angle + 270 <= endAngle) {
-                tft.drawPixel( centerX - y, centerY + x);
+                drawPixel( centerX - y, centerY + x);
             }
         }
     }

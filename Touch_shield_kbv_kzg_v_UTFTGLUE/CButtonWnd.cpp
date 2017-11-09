@@ -1,7 +1,7 @@
 
 #include "CButtonWnd.h"
 
-CButtonWnd::CButtonWnd(UTFTGLUE* tft,  uint8_t id, uint16_t x, uint16_t y, uint16_t w, uint16_t h,char *txt)
+CButtonWnd::CButtonWnd(CLcd* lcd,  uint8_t id, uint16_t x, uint16_t y, uint16_t w, uint16_t h,char *txt)
 {
  _id=id;
   _x=x;
@@ -12,10 +12,10 @@ CButtonWnd::CButtonWnd(UTFTGLUE* tft,  uint8_t id, uint16_t x, uint16_t y, uint1
   _y1=y+h;
   strcpy(_txt,txt);
   _stan=STAN_AKTYWNY;
-  _tft=tft;
+  _lcd=lcd;
   _typ=TYP_TEXT;
 }
-CButtonWnd::CButtonWnd(UTFTGLUE* tft,  uint8_t id, uint16_t x, uint16_t y, uint16_t w, uint16_t h,uint16_t *bmpAktyw,uint16_t *bmpAktywWybr)
+CButtonWnd::CButtonWnd(CLcd* lcd,  uint8_t id, uint16_t x, uint16_t y, uint16_t w, uint16_t h,uint16_t *bmpAktyw,uint16_t *bmpAktywWybr)
 {
   _id=id;
   _x=x;
@@ -26,10 +26,26 @@ CButtonWnd::CButtonWnd(UTFTGLUE* tft,  uint8_t id, uint16_t x, uint16_t y, uint1
   _y1=y+h;
   strcpy(_txt,"");
   _stan=STAN_AKTYWNY;
-  _tft=tft;
+  _lcd=lcd;
   _bmpAktyw=bmpAktyw;
   _bmpAktywWybr=bmpAktywWybr;
   _typ=TYP_BMP;
+}
+CButtonWnd::CButtonWnd(CLcd* lcd,  uint8_t id, uint16_t x, uint16_t y, uint16_t w, uint16_t h,const char* bmpAktyw,const char *bmpAktywWybr)
+{
+  _id=id;
+  _x=x;
+  _y=y;
+  _w=w;
+  _h=h;
+  _x1=x+w;
+  _y1=y+h;
+  strcpy(_txt,"");
+  _stan=STAN_AKTYWNY;
+  _lcd=lcd;
+  _bmpAktywStr=bmpAktyw;
+  _bmpAktywWybrStr=bmpAktywWybr;
+  _typ=TYP_BMP_str;
 }
 void CButtonWnd:: Rysuj()//( MCUFRIEND_kbv* tft )
 {
@@ -42,43 +58,56 @@ void CButtonWnd:: Rysuj()//( MCUFRIEND_kbv* tft )
 		case TYP_TEXT:
 			if(_stan==STAN_AKTYWNY)
 			{
-				_tft->setColor(0,0,255);
+				_lcd->setColor(0,0,255);
 			}
 			else  
 			{
-				_tft->setColor(200,200,255);
+				_lcd->setColor(200,200,255);
 			}
-			_tft->fillRoundRect(_x, _y, _x1, _y1);
+			_lcd->fillRoundRect(_x, _y, _x1, _y1);
 			for (int i=1; i<6; i++)
 			{
-				_tft->setColor(i*15,i*15,255-i*15);
-				_tft->drawRoundRect(_x+(2*i), _y+(2*i), _x1-(2*i), _y1-(2*i));
+				_lcd->setColor(i*15,i*15,255-i*15);
+				_lcd->drawRoundRect(_x+(2*i), _y+(2*i), _x1-(2*i), _y1-(2*i));
 			}    
-			 _tft->setCursor(_x+10, _y+10);
+			 _lcd->setCursor(_x+10, _y+10);
 			if(_stan==0)
 			{ 
-				_tft->setTextColor(0xFFFFFF);}
+				_lcd->setTextColor(0xFFFFFF);}
 			else  
 			{
-			   _tft->setTextColor(0x101010);
+			   _lcd->setTextColor(0x101010);
 			}
-			 _tft->print(_txt,_x+10,_y+10);
+			 _lcd->print(_txt,_x+10,_y+10);
 		return;
 		case TYP_BMP:
 			switch(_stan)
 			{
 			case STAN_AKTYWNY:
-				_tft->drawBitmap(_x,_y,_w,_h,_bmpAktyw);
+				_lcd->drawBitmap(_x,_y,_w,_h,_bmpAktyw);
 				break;
 			case STAN_AKTYWNY_WYBRANY:
-				_tft->drawBitmap(_x,_y,_w,_h,_bmpAktywWybr);
+				_lcd->drawBitmap(_x,_y,_w,_h,_bmpAktywWybr);
 				break;
 			case STAN_NIEAKTYWNY:
-				_tft->setColor(200,200,255);
-				_tft->fillRoundRect(_x, _y, _x1, _y1);
+				_lcd->setColor(200,200,255);
+				_lcd->fillRoundRect(_x, _y, _x1, _y1);
 				break;
 			}
-			
+		case TYP_BMP_str:
+			switch(_stan)
+			{
+			case STAN_AKTYWNY:
+				_lcd->showBMP(_bmpAktywStr,_x,_y);
+				break;
+			case STAN_AKTYWNY_WYBRANY:
+				_lcd->showBMP(_bmpAktywWybrStr, _x,_y);
+				break;
+			case STAN_NIEAKTYWNY:
+				_lcd->setColor(200,200,255);
+				_lcd->fillRoundRect(_x, _y, _x1, _y1);
+				break;
+			}	
 		return;
 	}  
 }

@@ -20,7 +20,7 @@
 extern uint8_t SmallFont[];    //.kbv GLUE defines as GFXFont ref
 #endif
 
- 
+
 
 
 #define SD_CS 10
@@ -62,11 +62,10 @@ extern uint8_t SmallFont[];    //.kbv GLUE defines as GFXFont ref
 
 class CWentGUI;
  
-class CLcd
+class CLcd:public UTFTGLUE
 {
   public:
- // MCUFRIEND_kbv tft;       // hard-wired for UNO shields anyway.
-
+ 
   uint8_t XM = A2;  // must be an analog pin, use "An" notation!
   uint8_t YM = 7;   // can be a digital pin
   uint8_t XP = 6;   // can be a digital pin
@@ -106,9 +105,9 @@ CButtonWnd bDebug;
 CWentGUI *_wentWnd;
 uint16_t read16(File& f);
 uint32_t read32(File& f);
-uint8_t showBMP(char *nm, int x, int y);
+
   public:
-  CLcd(){ };
+  CLcd() : UTFTGLUE(0x0154,A2,A1,A3,A4,A0){};
   void begin();
   void initGUI();
   void show_tft();
@@ -122,8 +121,9 @@ uint8_t showBMP(char *nm, int x, int y);
  
   int touch();
   void zmienEkran(uint8_t e);
-void drawMidpointCircle(uint16_t cx,uint16_t cy,uint16_t radius,uint16_t startAngle, uint16_t endangle);
-void drawCirclePoints( uint16_t centerX, uint16_t centerY, uint16_t x, uint16_t y, uint16_t startAngle, uint16_t endAngle);
+  uint8_t showBMP(char *nm, int x, int y);
+  void drawMidpointCircle(uint16_t cx,uint16_t cy,uint16_t radius,uint16_t startAngle, uint16_t endangle);
+  void drawCirclePoints( uint16_t centerX, uint16_t centerY, uint16_t x, uint16_t y, uint16_t startAngle, uint16_t endAngle);
 };
 
 #endif

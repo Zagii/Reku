@@ -1,16 +1,16 @@
 
 #include "CWentGUI.h"
 
-  CWentGUI::CWentGUI(UTFTGLUE* tft,  uint16_t x, uint16_t y)
+  CWentGUI::CWentGUI(CLcd *lcd,  uint16_t x, uint16_t y)
    {
 	  _x=x;_y=y;_x1=x+_w;_y1=y+_h; 
- 
+    _lcd=lcd;
    }
-void   CWentGUI::begin(CLcd *lcd) //inicjalne rysowanie z przykryciem tła
+void   CWentGUI::begin() //inicjalne rysowanie z przykryciem tła
    {
-      _lcd=lcd;
-	   _tft->setColor(0,0,0);
-	   _tft->fillRect(_x, _y, _x1, _y1);
+   
+	   _lcd->setColor(0,0,0);
+	   _lcd->fillRect(_x, _y, _x1, _y1);
 	   Rysuj(0,0,CWentGUI_PWM_stop);
    }
    void CWentGUI::Rysuj(uint8_t pwmNawiew,uint8_t pwmWywiew, uint8_t tryb)
@@ -67,7 +67,7 @@ void   CWentGUI::begin(CLcd *lcd) //inicjalne rysowanie z przykryciem tła
 	   uint16_t maxRN= map(_pozNawiew, 0, 100, 0, 270);
 	   uint16_t maxRW= map(_pozWywiew, 0, 100, 0, 270);
 	   ///ramka
-	   _tft->setColor(255,255,255);
+	   _lcd->setColor(255,255,255);
 	   _lcd->drawMidpointCircle(_cx,_cy,_r,0, 270); 
 	   _lcd->drawMidpointCircle(_cx,_cy,_r+_gr,0, 270); 
 		  
