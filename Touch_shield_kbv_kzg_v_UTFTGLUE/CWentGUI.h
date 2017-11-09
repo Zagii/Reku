@@ -4,6 +4,7 @@
 #include <Adafruit_GFX.h>
 #include <UTFTGLUE.h>    
 #include <MCUFRIEND_kbv.h>
+#include "CLcd.h"
 
 #define BMP_wiatrak 0
 #define BMP_wakacje 1
@@ -29,7 +30,7 @@ static const uint8_t pwmPoz[]={		254		,	10	  ,		30	  ,		50	  ,		70	 ,	254		}; //
 #define CWentGUI_ukryj 0
 #define CWentGUI_pokaz 1
 
-
+class CLcd;
 
 class CWentGUI
 {
@@ -50,13 +51,15 @@ class CWentGUI
   uint8_t _tryb=CWentGUI_PWM_stop;
  // uint8_t _klik=KLIK_PUSZCZONY;
   UTFTGLUE* _tft;
+  CLcd *_lcd;
   public:
-   CWentGUI(){_typ=TYP_UNDF;_id=0;};
+   CWentGUI(){};
    CWentGUI(UTFTGLUE* tft,   uint16_t x, uint16_t y);
-   void begin();
-   void Rysuj(uint8_t pwmNawiew,uint8_t pwmWywiew);
+   void begin(CLcd *lcd);
+   void Rysuj(uint8_t pwmNawiew,uint8_t pwmWywiew,uint8_t tryb);
    uint16_t  czyKlik(uint16_t x,uint16_t y);
    void zmienStan(uint8_t stan);
+   uint8_t inCircle( uint16_t x, uint16_t y,uint8_t R );
 };
 
 

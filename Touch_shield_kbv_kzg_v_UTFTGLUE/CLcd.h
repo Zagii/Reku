@@ -13,6 +13,7 @@
 #include "CButtonWnd.h"
 #include "CWiatrak.h"
 #include "CKomora.h"
+#include "CWentGUI.h"
 
 // Declare which fonts we will be using
 #if !defined(SmallFont)
@@ -58,6 +59,8 @@ extern uint8_t SmallFont[];    //.kbv GLUE defines as GFXFont ref
 
 #define PALETTEDEPTH   8
 #define BUFFPIXEL 20
+
+class CWentGUI;
  
 class CLcd
 {
@@ -100,6 +103,7 @@ CButtonWnd bminus;
 CButtonWnd bInfo;
 CButtonWnd bDashboard;
 CButtonWnd bDebug;
+CWentGUI *_wentWnd;
 uint16_t read16(File& f);
 uint32_t read32(File& f);
 uint8_t showBMP(char *nm, int x, int y);
@@ -118,7 +122,8 @@ uint8_t showBMP(char *nm, int x, int y);
  
   int touch();
   void zmienEkran(uint8_t e);
-
+void drawMidpointCircle(uint16_t cx,uint16_t cy,uint16_t radius,uint16_t startAngle, uint16_t endangle);
+void drawCirclePoints( uint16_t centerX, uint16_t centerY, uint16_t x, uint16_t y, uint16_t startAngle, uint16_t endAngle);
 };
 
 #endif

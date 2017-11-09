@@ -8,6 +8,7 @@
 #include "CLcd.h"
 #include "CWiatrak.h"
 #include "CKomora.h"
+#include "CWentGUI.h"
 
 #define WIATRAK_IN 0
 #define WIATRAK_OUT 1

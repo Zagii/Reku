@@ -118,7 +118,7 @@ void CButtonWnd:: Rysuj()//( MCUFRIEND_kbv* tft )
 		case KLIK_WCISNIETY: //wcisniecie i trzymanie butona
 			if(klik_wew) //jesli nadal jest trzymany
 			{
-				ret=millis()-ms;								
+				ret=millis()-_ms;								
 			}else
 			{
 				_klik=KLIK_PUSZCZANY;

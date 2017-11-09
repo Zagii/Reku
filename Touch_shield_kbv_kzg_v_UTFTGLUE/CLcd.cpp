@@ -127,6 +127,8 @@ stary_loop();
 bInfo=CButtonWnd(&tft,4,15,190,45,45,infoBiale,infoZolte);
 bDashboard=CButtonWnd(&tft,5,80,190,45,45,dashboardBiale,dashboardZolte);
 bDebug=CButtonWnd(&tft,6,145,190,45,45,mechanicBiale,mechanicZolte);
+_wentWnd= new CWentGUI(&tft,   190, 40);
+_wentWnd->begin(this);
 zmienEkran(EKRAN_INFO);
  }
        
@@ -207,7 +209,7 @@ zmienEkran(EKRAN_INFO);
       tft.fillRect(15,90,150,130);
       tft.setTextColor(0xffffff);
       tft.print(s3.c_str(),20,100);
-     
+     _wentWnd->Rysuj( 50,80,0);
       Serial.println(s3);
       break;
       case ekran_prosty:
@@ -489,48 +491,49 @@ uint8_t CLcd::showBMP(char *nm, int x, int y)
 	{
 
         // Calculate the angle the current point makes with the circle center
-        uint16_t angle = (uint16_t) toDegrees(atan2(y, x));
-		uint16_t kolor=0xffffff;
+        uint16_t rad=atan2(y, x);
+        uint16_t angle = (uint16_t)(rad * 4068) / 71; 
+		tft.setColor(255,255,255);
         // draw the circle points as long as they lie in the range specified
         if (x < y) {
             // draw point in range 0 to 45 degrees
             if (90 - angle >= startAngle && 90 - angle <= endAngle) {
-                tft.drawPixel( centerX - y, centerY - x,kolor);
+                tft.drawPixel( centerX - y, centerY - x);
             }
 
             // draw point in range 45 to 90 degrees
             if (angle >= startAngle && angle <= endAngle) {
-                tft.drawPixel( centerX - x, centerY - y,kolor);
+                tft.drawPixel( centerX - x, centerY - y);
             }
 
             // draw point in range 90 to 135 degrees
             if (180 - angle >= startAngle && 180 - angle <= endAngle) {
-                tft.drawPixel( centerX + x, centerY - y,kolor);
+                tft.drawPixel( centerX + x, centerY - y);
             }
 
             // draw point in range 135 to 180 degrees
             if (angle + 90 >= startAngle && angle + 90 <= endAngle) {
-                tft.drawPixel( centerX + y, centerY - x,kolor);
+                tft.drawPixel( centerX + y, centerY - x);
             }
 
             // draw point in range 180 to 225 degrees
             if (270 - angle >= startAngle && 270 - angle <= endAngle) {
-                tft.drawPixel( centerX + y, centerY + x,kolor);
+                tft.drawPixel( centerX + y, centerY + x);
             }
 
             // draw point in range 225 to 270 degrees
             if (angle + 180 >= startAngle && angle + 180 <= endAngle) {
-                tft.drawPixel( centerX + x, centerY + y,kolor);
+                tft.drawPixel( centerX + x, centerY + y);
             }
 
             // draw point in range 270 to 315 degrees
             if (360 - angle >= startAngle && 360 - angle <= endAngle) {
-                tft.drawPixel( centerX - x, centerY + y,kolor);
+                tft.drawPixel( centerX - x, centerY + y);
             }
 
             // draw point in range 315 to 360 degrees
             if (angle + 270 >= startAngle && angle + 270 <= endAngle) {
-                tft.drawPixel( centerX - y, centerY + x,kolor);
+                tft.drawPixel( centerX - y, centerY + x);
             }
         }
     }
