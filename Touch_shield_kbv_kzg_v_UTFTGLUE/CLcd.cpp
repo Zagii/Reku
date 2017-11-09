@@ -27,7 +27,7 @@ void CLcd::begin()
    InitLCD(3);
    setFont(SmallFont);
    clrScr();
-    show_tft();
+   
 
     BOXSIZE = width() / 6;
    
@@ -41,10 +41,7 @@ void CLcd::begin()
     delay(300);
     }
 
-     void CLcd::show_tft(void)
-{
-  
-}
+ 
  void CLcd::stary_loop()
 {
    
@@ -115,7 +112,7 @@ void CLcd::show_Serial(void)
     Serial.println("YM=" + String(YM)  + " XP=" + String(XP));
 }
 
-void CLcd::initGUI()
+void CLcd__initGUI()
 {
   
 b1=CButtonWnd( this,0,250,150,70,40,"Czyste");
@@ -129,49 +126,26 @@ _wentWnd= new CWentGUI(this,   190, 40);
 _wentWnd->begin(this);
 zmienEkran(EKRAN_INFO);
  }
-       
-  void CLcd::loopDyn()
-  {
-   }
-   void CLcd::loopStat()
-   {
 
-    }
+void CLcd::initGUI()
+{
+	
+} 
+ 
  void CLcd::zmienEkran(uint8_t e)
  {
   ekran=e;
- // tft.clrScr();
-  RysujMenuDol();
  }
- void CLcd::  RysujMenuDol()
- {
-  setColor(0x000000);
-  drawLine(0,25,320,25);//<<<<<<<<<<<<<<<<<<<<<<,,gora
-  //tft.fillRect(0,190,320,240);
-  setColor(255, 0, 0);
-  drawLine(0,185,320,185);
-        
-  switch(ekran)
+ 
+  uint8_t CLcd::loop(CWiatrak Wiatraki[], CKomora Komory[])
   {
-    case EKRAN_INFO:
-      bInfo.zmienStan(STAN_AKTYWNY_WYBRANY);
-      bDashboard.zmienStan(STAN_AKTYWNY);
-      bDebug.zmienStan(STAN_AKTYWNY);
-    break;
-    case EKRAN_DASHBOARD:
-      bInfo.zmienStan(STAN_AKTYWNY);
-      bDashboard.zmienStan(STAN_AKTYWNY_WYBRANY);
-      bDebug.zmienStan(STAN_AKTYWNY);
-    break;
-    case EKRAN_DEBUG:
-      bInfo.zmienStan(STAN_AKTYWNY);
-      bDashboard.zmienStan(STAN_AKTYWNY);
-      bDebug.zmienStan(STAN_AKTYWNY_WYBRANY);
-    break;
-   }
- }
+	if(touch()==1)// byl touch
+	{
+		
+	}
+  }
 
- uint8_t CLcd::loop(CWiatrak Wiatraki[], CKomora Komory[])
+ uint8_t CLcd__loop(CWiatrak Wiatraki[], CKomora Komory[])
  {
   uint8_t odswiez=0;
   uint8_t ret=0;

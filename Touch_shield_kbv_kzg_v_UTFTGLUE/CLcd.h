@@ -110,9 +110,8 @@ uint32_t read32(File& f);
   CLcd() : UTFTGLUE(0x0154,A2,A1,A3,A4,A0){};
   void begin();
   void initGUI();
-  void show_tft();
-  void loopDyn();
-  void loopStat();
+
+ 
   void stary_loop();
   uint8_t loop( CWiatrak Wiatraki[], CKomora Komory[]);//return czy jest rozkaz od uzytkownika lcd?
   void show_Serial(void);

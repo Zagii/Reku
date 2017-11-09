@@ -94,6 +94,7 @@ void CButtonWnd:: Rysuj()//( MCUFRIEND_kbv* tft )
 				_lcd->fillRoundRect(_x, _y, _x1, _y1);
 				break;
 			}
+		return;
 		case TYP_BMP_str:
 			switch(_stan)
 			{
