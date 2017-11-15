@@ -25,6 +25,7 @@ void CLcd::begin()
     ts = TouchScreen(XP, YP, XM, YM, 300);     //call the constructor AGAIN with new values.
 
    InitLCD(3);
+   show_Serial();
    setFont(SmallFont);
    clrScr();
    
@@ -124,24 +125,36 @@ stary_loop();
 
 _wentWnd= new CWentGUI(this,   190, 40);
 _wentWnd->begin(this);
+
 zmienEkran(EKRAN_INFO);
  }
 
 void CLcd::initGUI()
 {
+///////////////////////// init ekranow
+ekrany[EKRAN_INFO]=(CEkran*) new CEkranInfo(this,EKRAN_INFO);
+ekrany[EKRAN_INFO]->begin();
+
+//////////////////////////////////
+zmienEkran(EKRAN_INFO);
+
 	
 } 
  
  void CLcd::zmienEkran(uint8_t e)
  {
   ekran=e;
+  przerysujEkran=true;
  }
  
   uint8_t CLcd::loop(CWiatrak Wiatraki[], CKomora Komory[])
   {
+	if(przerysujEkran)
+		  ekrany[e]->RysujZTlem(Wiatraki,Komory);
 	if(touch()==1)// byl touch
 	{
-		
+		return ekrany[e]->Touch(xpos,ypos);
+				
 	}
   }
 
@@ -510,3 +523,12 @@ uint8_t CLcd::showBMP(char *nm, int x, int y)
         }
     }
 //=========================================================
+
+void CLcd::kopnietyKwadrat(uint16_t x, uint16_t y, uint16_t x2, uint16_t y2, uint16_t g,int przesunX, int przesunY)
+{
+	for(uint16_t i=0;i<g;i++)
+	{
+		drawLine(x+i*przesunX,y+i*przesunY,x2+i*przesunX,y2+i*przesunY);
+	}
+	
+}

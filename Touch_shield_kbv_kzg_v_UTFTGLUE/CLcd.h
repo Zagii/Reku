@@ -47,13 +47,14 @@ extern uint8_t SmallFont[];    //.kbv GLUE defines as GFXFont ref
 
 #define SWAP(a, b) {uint16_t tmp = a; a = b; b = tmp;}
 
-#define ekran_test 0
-#define ekran_debug 1
-#define ekran_prosty 2
-#define EKRAN_INFO 3
-#define EKRAN_DASHBOARD 4
-#define EKRAN_DEBUG 5
 
+#define EKRAN_INFO 0
+#define EKRAN_DASHBOARD 1
+#define EKRAN_DEBUG 2
+#define ekran_test 3
+#define ekran_debug 4
+#define ekran_prosty 5
+#define ILE_EKRANOW 3
  
 #define BMPIMAGEOFFSET 54
 
@@ -61,6 +62,7 @@ extern uint8_t SmallFont[];    //.kbv GLUE defines as GFXFont ref
 #define BUFFPIXEL 20
 
 class CWentGUI;
+class CEkran;
  
 class CLcd:public UTFTGLUE
 {
@@ -82,7 +84,7 @@ class CLcd:public UTFTGLUE
   // For the one we're using, its 300 ohms across the X plate
   TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
   TSPoint tp;
-
+bool przerysujEkran=true;
  uint8_t ekran=0;
    uint8_t aw=0;
   // most mcufriend shields use these pins and Portrait mode:
@@ -103,17 +105,19 @@ CButtonWnd bInfo;
 CButtonWnd bDashboard;
 CButtonWnd bDebug;
 CWentGUI *_wentWnd;
+CEkran *ekrany[ILE_EKRANOW]; 
 uint16_t read16(File& f);
 uint32_t read32(File& f);
-
+rozkazJson _rozkazCallBack;
   public:
-  CLcd() : UTFTGLUE(0x0154,A2,A1,A3,A4,A0){};
+  CLcd(rozkazJson rozkazCallBack) : UTFTGLUE(0x0154,A2,A1,A3,A4,A0){_rozkazCallBack=rozkazCallBack;};
   void begin();
   void initGUI();
 
+  void kopnietyKwadrat(uint16_t x, uint16_t y, uint16_t x2, uint16_t y2, uint16_t g,int przesunX, int przesunY);
  
   void stary_loop();
-  uint8_t loop( CWiatrak Wiatraki[], CKomora Komory[]);//return czy jest rozkaz od uzytkownika lcd?
+  uint8_t loop( CWiatrak Wiatraki[], CKomora Komory[],rozkazJson rozkazCallBack);//return czy jest rozkaz od uzytkownika lcd?
   void show_Serial(void);
 
   void RysujMenuDol();

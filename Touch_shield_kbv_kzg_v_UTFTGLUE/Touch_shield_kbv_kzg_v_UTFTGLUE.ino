@@ -5,6 +5,13 @@
 #include <SPI.h>          // f.k. for Arduino-1.5.2
 #include <SdFat.h>           // Use the SdFat library
 #include <MCUFRIEND_kbv.h>
+#include <ArduinoJson.h>
+
+
+typedef char*( * rozkazJson )( uint8_t,uint16_t);
+
+char* zrobJson(uint8_t paramName, uint16_t paramValue);
+
 #include "CLcd.h"
 #include "CWiatrak.h"
 #include "CKomora.h"
@@ -25,7 +32,17 @@
 #define KOMORA_SZT 4
 #define WIATRAKI_SZT 2
 
-CLcd lcd;
+#define JSON_PWM_NAWIEW 'N'	// pwm wiatrak 1
+#define JSON_PWM_WYWIEW 'W'   // pwm wiatrak 2
+#define JSON_ROZMRAZANIE_WIATRAKI 'R'	//
+#define JSON_ROZMRAZANIE_GGWC 'G' //
+#define JSON_KOMINEK 'K' //
+
+#define JSON_DL_ROZKAZU 150
+char rozkazStr[JSON_DL_ROZKAZU];
+
+
+CLcd lcd(zrobJson);
 CKomora komory[KOMORA_SZT];
 CWiatrak wiatraki[WIATRAKI_SZT]=
 {
@@ -33,11 +50,12 @@ CWiatrak wiatraki[WIATRAKI_SZT]=
 	CWiatrak(PIN_WIATRAK_WYWIEW,PIN_TACHO_WIATRAK_WYWIEW)
 };
 
+
 void setup(void)
 {
    Serial.begin(9600);
    lcd.begin();
-   lcd.show_Serial();
+  
    
    for(uint8_t i=0;i<KOMORA_SZT;i++)
    {
@@ -58,6 +76,20 @@ void isrOUT()
   wiatraki[WIATRAK_OUT].obslugaTachoISR();
 }
 
+
+char* zrobJson(uint8_t paramName, uint16_t paramValue) 
+{
+	StaticJsonBuffer<JSON_DL_ROZKAZU> jsonBuffer;
+	JsonArray& rozkazyTab = jsonBuffer.parseArray(rozkazStr);
+	JsonArray& array = jsonBuffer.createArray();
+	array.add(paramName);
+	array.add(paramValue);
+    rozkazyTab.add(array);
+	rozkazyTab.printTo(rozkazStr);
+  }
+
+  return root;
+}
 void loop()
 {
 	for(uint8_t i=0;i<KOMORA_SZT;i++)
@@ -68,7 +100,7 @@ void loop()
     wiatraki[WIATRAK_OUT].loop();
 	if(lcd.loop( wiatraki, komory)!=0)
 	{
-		//parsowanie rozkazu
+		//parsowanie rozkazu zapisanego juz w rozkazStr
 		/*
 		*
 		ustaw pwm wiatraka na wartosc

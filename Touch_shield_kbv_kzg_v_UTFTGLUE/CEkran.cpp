@@ -1,10 +1,13 @@
 
 #include "CEkran.h"
 
-CEkran::CEkran(CLcd *lcd,uint8_t ekranID)
+
+
+CEkran::CEkran(CLcd *lcd,uint8_t ekranID,rozkazJson rozkazCallBack)
 {
 	_lcd=lcd;
 	_ekranID=ekranID;
+	_rozkazCallBack=rozkazCallBack;
 	// tworzy buttony menu dolnego
 	for(int i=0;i<ILE_MENU_BTN;i++)
 	{
@@ -46,10 +49,33 @@ void CEkran::RysujMenuDol()
 //////////////////////////ekran info
 virtual void CEkranInfo::Rysuj(CWiatrak wiatraki[], CKomora komory[])
 {
+	RysujMenuGora(wiatraki,komory);
+	_wentGUI->Rysuj(wiatraki,komory);
+	RysujMenuDol();
+	// rysuj domek i inne duperele
+	_lcd->setColor(255,255,255);
+	uint16_t x=10;uint16_t y=50;
+	uint16_t w=100;uint16_t h=100;
+	
+	_lcd->kopnietyKwadrat(x,y+25+5,x+w/2,y+5,5,1,-1);
+	_lcd->kopnietyKwadrat(x+w/2,y+5,x+w,y+25,5,0,1);
+	_lcd->kopnietyKwadrat(x+w/2,y+5,x+w,y+25,5,0,1);
+	_lcd->kopnietyKwadrat(x+w/2,y+5,x+w,y+25,5,0,1);
 	
 }
 
-virtual void CEkranInfo::Touch(uint8_t x, uint8_t y)
+
+virtual bool CEkranInfo::Touch(uint8_t x, uint8_t y)
 {
+	// zmien wyswietlane GUI jesli w ramach tego samego ekranu
+	// tworzy rozkaz do obslugi w klasie rodzica
 	
+	//czy trzeba przerysowac ekran?
+	
+return false;	
+}
+virtual void CEkranInfo::begin()
+{
+	_wentGUI= new CWentGUI(this,   190, 40);
+	_wentGUI->begin(this);
 }
