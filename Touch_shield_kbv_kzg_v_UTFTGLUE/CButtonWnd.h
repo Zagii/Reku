@@ -22,6 +22,7 @@
 #define KLIK_WCISNIETY 2
 #define KLIK_PUSZCZANY 3
 
+class CLcd;
 
 class CButtonWnd
 {

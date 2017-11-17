@@ -11,7 +11,7 @@ CEkran::CEkran(CLcd *lcd,uint8_t ekranID,rozkazJson rozkazCallBack)
 	// tworzy buttony menu dolnego
 	for(int i=0;i<ILE_MENU_BTN;i++)
 	{
-		menuDolBtn[i]=new CButtonWnd(this,i,i*45+4+i*25,190,45,45,plikiBMP_B,plikiBMP_Z);
+		menuDolBtn[i]=new CButtonWnd(_lcd,i,i*45+4+i*25,190,45,45,(const char*)plikiBMP_B,(const char*)plikiBMP_Z);
 		if(i==_ekranID)
 			menuDolBtn[i]->zmienStan(STAN_AKTYWNY_WYBRANY);
 		else
@@ -47,10 +47,10 @@ void CEkran::RysujMenuDol()
 
 
 //////////////////////////ekran info
-virtual void CEkranInfo::Rysuj(CWiatrak wiatraki[], CKomora komory[])
+ void CEkranInfo::Rysuj(CWiatrak wiatraki[], CKomora komory[])
 {
 	RysujMenuGora(wiatraki,komory);
-	_wentGUI->Rysuj(wiatraki,komory);
+	_wentGUI->Rysuj(wiatraki[0].dajZadanaPredkoscProcent(),wiatraki[1].dajZadanaPredkoscProcent(),CWentGUI_PWM_auto);
 	RysujMenuDol();
 	// rysuj domek i inne duperele
 	_lcd->setColor(255,255,255);
@@ -65,7 +65,7 @@ virtual void CEkranInfo::Rysuj(CWiatrak wiatraki[], CKomora komory[])
 }
 
 
-virtual bool CEkranInfo::Touch(uint8_t x, uint8_t y)
+  bool CEkranInfo::Touch(uint8_t x, uint8_t y)
 {
 	// zmien wyswietlane GUI jesli w ramach tego samego ekranu
 	// tworzy rozkaz do obslugi w klasie rodzica
@@ -74,8 +74,8 @@ virtual bool CEkranInfo::Touch(uint8_t x, uint8_t y)
 	
 return false;	
 }
-virtual void CEkranInfo::begin()
+ void CEkranInfo::begin()
 {
-	_wentGUI= new CWentGUI(this,   190, 40);
-	_wentGUI->begin(this);
+	_wentGUI= new CWentGUI(_lcd,   190, 40);
+	_wentGUI->begin();
 }

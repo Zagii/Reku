@@ -5,7 +5,7 @@ extern  uint16_t  dashboardZolte[];
 extern  uint16_t  dashboardBiale[];
 extern  uint16_t  infoBiale[];
 extern  uint16_t  infoZolte[];
-extern  uint16_t  mechanicBiale[];
+extern  uint16_t  mechanicBiale[]; 
 extern  uint16_t  mechanicZolte[];
 
 void CLcd::begin()
@@ -113,26 +113,13 @@ void CLcd::show_Serial(void)
     Serial.println("YM=" + String(YM)  + " XP=" + String(XP));
 }
 
-void CLcd__initGUI()
-{
-  
-b1=CButtonWnd( this,0,250,150,70,40,"Czyste");
 
-b2=CButtonWnd(this,1,250,100,70,40,"Rysowanie");
-bplus=CButtonWnd(this,2,180,100,40,40,"Plus");
-bminus=CButtonWnd(this,3,250,100,40,40,"Minus");
-stary_loop();
-
-_wentWnd= new CWentGUI(this,   190, 40);
-_wentWnd->begin(this);
-
-zmienEkran(EKRAN_INFO);
- }
 
 void CLcd::initGUI()
 {
 ///////////////////////// init ekranow
-ekrany[EKRAN_INFO]=(CEkran*) new CEkranInfo(this,EKRAN_INFO);
+ekranInfo=new CEkranInfo(_lcd,EKRAN_INFO);
+ekrany[EKRAN_INFO]=ekranInfo;
 ekrany[EKRAN_INFO]->begin();
 
 //////////////////////////////////
@@ -158,111 +145,7 @@ zmienEkran(EKRAN_INFO);
 	}
   }
 
- uint8_t CLcd__loop(CWiatrak Wiatraki[], CKomora Komory[])
- {
-  uint8_t odswiez=0;
-  uint8_t ret=0;
-  if(touch()==1)// byl touch
-  {
-     String s=String(100,DEC);
-      String s2;
-      String s3;
-    switch(ekran)
-    {
-      case ekran_test: 
-      if(b1.czyKlik(xpos,ypos))
-      {ekran=ekran_debug;
-      odswiez=2;}
-      odswiez=1;
-      break;
-      case ekran_debug:
-      if(bplus.czyKlik(xpos,ypos))
-      {
-        if(aw+25<=250)
-        aw+=25;
-        analogWrite(46,aw);
-      }
-       if(bminus.czyKlik(xpos,ypos))
-      {
-        if(aw-25>=0)
-        aw-=25;
-        analogWrite(46,aw);
-      }
-      s2=String(10*aw/25);
-      s3= s +" rpm, pwm="+s2+" %";
-      setColor(0,0,0);
-      fillRect(15,90,150,130);
-      setTextColor(0xffffff);
-      print(s3.c_str(),20,100);
-     _wentWnd->Rysuj( 50,80,0);
-      Serial.println(s3);
-      break;
-      case ekran_prosty:
-      break;
-    case EKRAN_INFO:
-      if(bDashboard.czyKlik(xpos,ypos))
-      {
-        zmienEkran(EKRAN_DASHBOARD);
-        odswiez=1;
-       }
-      if(bDebug.czyKlik(xpos,ypos))
-      {
-      zmienEkran(EKRAN_DEBUG);
-        odswiez=1;
-       }
-    break;
-    case EKRAN_DASHBOARD:
-       if(bInfo.czyKlik(xpos,ypos))
-      {
-        zmienEkran(EKRAN_INFO);
-        odswiez=1;
-       }
-      if(bDebug.czyKlik(xpos,ypos))
-      {
-        zmienEkran(EKRAN_DEBUG);
-        odswiez=1;
-       }
-    break;
-    case EKRAN_DEBUG:
-       if(bDashboard.czyKlik(xpos,ypos))
-      {
-        zmienEkran(EKRAN_DASHBOARD);
-        odswiez=1;
-       }
-      if(bInfo.czyKlik(xpos,ypos))
-      {
-        zmienEkran(EKRAN_INFO);
-        odswiez=1;
-       }
-    break;
-    }
-  }
-  if(odswiez==2){b1.zmienStan(1);
-                b2.zmienStan(0);}
-  if(odswiez==1) /// rysowanie ekranu gdy trzeba odswiezyc
-  {
-    
-    switch(ekran)
-    {
-      case ekran_test: 
-      stary_loop();
- 
-      break;
-      case ekran_debug:
-      //   b1.zmienStan(1);
-       //   b2.zmienStan(0);
-       
-    //   bplus.Rysuj();
-    //   bminus.Rysuj();
-    zmienEkran(EKRAN_INFO);
-      break;
-      case ekran_prosty:
-      
-      break;
-    }
-  }
-  return ret;
- }
+
 
  int CLcd::touch()
  {

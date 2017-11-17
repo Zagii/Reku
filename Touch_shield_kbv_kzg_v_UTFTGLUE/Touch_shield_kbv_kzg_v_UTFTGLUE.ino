@@ -1,3 +1,13 @@
+/**
+ * potrzebne biblioteki: 
+ * MCUFRIEND_kbv.h ->https://github.com/prenticedavid/MCUFRIEND_kbv 
+ * touchscreen.h -> https://github.com/adafruit/Touch-Screen-Library
+ * Adafruit_GFX.h -> def arduino
+ * SdFat.h -> def arduino https://github.com/greiman/SdFat
+ * 
+ * 
+ */
+
 
 #include <Arduino.h>
 #include <Adafruit_GFX.h>    // Core graphics library
@@ -6,11 +16,6 @@
 #include <SdFat.h>           // Use the SdFat library
 #include <MCUFRIEND_kbv.h>
 #include <ArduinoJson.h>
-
-
-typedef char*( * rozkazJson )( uint8_t,uint16_t);
-
-char* zrobJson(uint8_t paramName, uint16_t paramValue);
 
 #include "CLcd.h"
 #include "CWiatrak.h"
@@ -41,6 +46,7 @@ char* zrobJson(uint8_t paramName, uint16_t paramValue);
 #define JSON_DL_ROZKAZU 150
 char rozkazStr[JSON_DL_ROZKAZU];
 
+char* zrobJson(uint8_t paramName, uint16_t paramValue);
 
 CLcd lcd(zrobJson);
 CKomora komory[KOMORA_SZT];
@@ -49,6 +55,7 @@ CWiatrak wiatraki[WIATRAKI_SZT]=
 	CWiatrak(PIN_WIATRAK_CZERPNIA,PIN_TACHO_WIATRAK_CZERPNIA),
 	CWiatrak(PIN_WIATRAK_WYWIEW,PIN_TACHO_WIATRAK_WYWIEW)
 };
+
 
 
 void setup(void)

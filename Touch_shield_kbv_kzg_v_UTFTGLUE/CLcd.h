@@ -10,11 +10,14 @@
 #include <TouchScreen.h>
 #include <MCUFRIEND_kbv.h>
 #include <UTFTGLUE.h>              // class methods are in here
+
+typedef char*( * rozkazJson )( uint8_t,uint16_t);
+
 #include "CButtonWnd.h"
 #include "CWiatrak.h"
 #include "CKomora.h"
 #include "CWentGUI.h"
-
+#include "CEkran.h"
 // Declare which fonts we will be using
 #if !defined(SmallFont)
 extern uint8_t SmallFont[];    //.kbv GLUE defines as GFXFont ref
@@ -63,6 +66,7 @@ extern uint8_t SmallFont[];    //.kbv GLUE defines as GFXFont ref
 
 class CWentGUI;
 class CEkran;
+class CEkranInfo;
  
 class CLcd:public UTFTGLUE
 {
@@ -77,7 +81,7 @@ class CLcd:public UTFTGLUE
   uint16_t TS_RT  = 149;
   uint16_t TS_TOP = 150;
   uint16_t TS_BOT = 958;
-  char *name = "Unknown controller";
+  char *name = "x";
     
   // For better pressure precision, we need to know the resistance
   // between X+ and X- Use any multimeter to read it
@@ -97,14 +101,9 @@ uint16_t xpos=0, ypos=0;  //screen coordinates ostatni wykryty touch
   uint8_t Orientation = 3;    //PORTRAIT  4- ok
  uint8_t SwapXY =1;
  char* btn="test";
-CButtonWnd b1;
-CButtonWnd b2;
-CButtonWnd bplus;
-CButtonWnd bminus;
-CButtonWnd bInfo;
-CButtonWnd bDashboard;
-CButtonWnd bDebug;
-CWentGUI *_wentWnd;
+
+CEkranInfo* ekranInfo;
+
 CEkran *ekrany[ILE_EKRANOW]; 
 uint16_t read16(File& f);
 uint32_t read32(File& f);
