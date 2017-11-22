@@ -123,9 +123,14 @@ rozkazJson _rozkazCallBack;
  
   int touch();
   void zmienEkran(uint8_t e);
-  uint8_t showBMP(char *nm, int x, int y);
+  uint8_t showBMP(char *nm, uint16_t x, uint16_t y);
   void drawMidpointCircle(uint16_t cx,uint16_t cy,uint16_t radius,uint16_t startAngle, uint16_t endangle);
   void drawCirclePoints( uint16_t centerX, uint16_t centerY, uint16_t x, uint16_t y, uint16_t startAngle, uint16_t endAngle);
+
+  void  drawTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3);
+    void  fillTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3);
+    void  drawArc(uint16_t x, uint16_t y, uint16_t r, int32_t startAngle, int32_t endAngle, int32_t thickness = 1);
+    void  drawPie(uint16_t x, uint16_t y, uint16_t r, int32_t startAngle, int32_t endAngle);
 };
 
 #endif

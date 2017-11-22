@@ -10,6 +10,7 @@ extern  uint16_t  mechanicZolte[];
 
 void CLcd::begin()
   {  
+    Serial.println("start cldc begin");
     uint16_t tmp;
    name = "S6D0154";
     
@@ -40,6 +41,7 @@ void CLcd::begin()
     }
      initGUI();
     delay(300);
+    Serial.println("koniec lcd begin");
     }
 
  
@@ -125,19 +127,23 @@ ekrany[EKRAN_INFO]->begin();
 //////////////////////////////////
 zmienEkran(EKRAN_INFO);
 
-	
+	Serial.println("koniec cldc initGUI");
 } 
  
  void CLcd::zmienEkran(uint8_t e)
  {
   _ekran=e;
   przerysujEkran=true;
+  Serial.println("zmiana ekranu");
  }
  
   uint8_t CLcd::loop(CWiatrak Wiatraki[], CKomora Komory[])
   {
 	if(przerysujEkran)
+		 { 
 		  ekrany[_ekran]->RysujZTlem(Wiatraki,Komory);
+      przerysujEkran=false;
+		 }
 	if(touch()==1)// byl touch
 	{
 		return ekrany[_ekran]->Touch(xpos,ypos);
@@ -187,8 +193,13 @@ uint32_t CLcd::read32(File& f) {
     return result;
 }
 
-uint8_t CLcd::showBMP(char *nm, int x, int y)
+uint8_t CLcd::showBMP(char *nm, uint16_t x, uint16_t y)
 {
+  Serial.print(nm);
+  Serial.print(" x=");
+   Serial.print(x);
+   Serial.print(" y=");
+    Serial.println(y);
     File bmpFile;
     int bmpWidth, bmpHeight;    // W+H in pixels
     uint8_t bmpDepth;           // Bit depth (currently must be 24, 16, 8, 4, 1)
@@ -415,3 +426,122 @@ void CLcd::kopnietyKwadrat(uint16_t x, uint16_t y, uint16_t x2, uint16_t y2, uin
 	}
 	
 }
+
+/////////////////////////// utft geometry
+
+void CLcd::drawTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3)
+{
+  drawLine(x1, y1, x2, y2);
+ drawLine(x2, y2, x3, y3);
+ drawLine(x3, y3, x1, y1);
+}
+
+void CLcd::fillTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3)
+{
+  int32_t xs, xe;
+  int16_t y, ly;
+
+  if (y1 > y2)
+  {
+    swap(y1, y2); 
+    swap(x1, x2);
+  }
+  if (y2 > y3)
+  {
+    swap(y3, y2);
+    swap(x3, x2);
+  }
+  if (y1 > y2)
+  {
+    swap(y1, y2);
+    swap(x1, x2);
+  }
+  
+  if(y1 == y3)  // Single line triangles
+  {
+    xs = xe = x1;
+    if(x2 < xs)     xs = x2;
+    else if(x2 > xe)  xe = x2;
+    if(x3 < xs)     xs = x3;
+    else if(x3 > xe)  xe = x3;
+   drawLine(xs, y1, xe-xs,y1);
+    return;
+  }
+  
+  // Upper part
+  if (y2 == y3) ly = y2;
+  else          ly = y2-1;
+  
+  for(y=y1; y<=ly; y++)
+  {
+    xs = x1 + (x2 - x1) * (y - y1) / (y2 - y1);
+    xe = x1 + (x3 - x1) * (y - y1) / (y3 - y1);
+    drawLine(xs, y, xe-xs,y);
+  }
+  
+  // Lower part
+  for(; y<=y3; y++)
+  {
+    xs = x2 + (x3 - x2) * (y - y2) / (y3 - y2);
+    xe = x1 + (x3 - x1) * (y - y1) / (y3 - y1);
+   drawLine(xs, y, xe-xs,y);
+  }
+}
+
+void CLcd::drawArc(uint16_t x, uint16_t y, uint16_t r, int32_t startAngle, int32_t endAngle, int32_t thickness)
+{
+  int32_t rDelta =0;// -(thickness/2);
+  int32_t px, py, cx, cy;
+
+  startAngle -= 90;
+  endAngle   -= 90;
+  
+  if (startAngle!=endAngle)
+  {
+    for (int32_t i=0; i<thickness; i++)
+    {
+      px = x + cos((startAngle*3.14)/180) * (r+rDelta+i);
+      py = y + sin((startAngle*3.14)/180) * (r+rDelta+i);
+      for (int32_t d=startAngle+1; d<endAngle+1; d++)
+      {
+        cx = x + cos((d*3.14)/180) * (r+rDelta+i);
+        cy = y + sin((d*3.14)/180) * (r+rDelta+i);
+       drawLine(px, py, cx, cy);
+        px = cx;
+        py = cy;
+      }
+    }
+  }
+  else
+  {
+    px = x + cos((startAngle*3.14)/180) * (r+rDelta);
+    py = y + sin((startAngle*3.14)/180) * (r+rDelta);
+    cx = x + cos((startAngle*3.14)/180) * (r-rDelta);
+    cy = y + sin((startAngle*3.14)/180) * (r-rDelta);
+    drawLine(px, py, cx, cy);
+  }
+}
+
+void CLcd::drawPie(uint16_t x, uint16_t y, uint16_t r, int32_t startAngle, int32_t endAngle)
+{
+  int32_t px, py, cx, cy;
+
+  startAngle -= 90;
+  endAngle   -= 90;
+  if (startAngle>endAngle)
+    startAngle -= 360;
+  
+  px = x + cos((startAngle*3.14)/180) * r;
+  py = y + sin((startAngle*3.14)/180) * r;
+  drawLine(x, y, px, py);
+  for (int32_t d=startAngle+1; d<endAngle+1; d++)
+  {
+    cx = x + cos((d*3.14)/180) * r;
+    cy = y + sin((d*3.14)/180) * r;
+   drawLine(px, py, cx, cy);
+    px = cx;
+    py = cy;
+  }
+  drawLine(x, y, px, py);
+}
+

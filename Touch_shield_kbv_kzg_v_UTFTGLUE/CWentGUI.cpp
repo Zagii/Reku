@@ -8,16 +8,22 @@
    }
 void   CWentGUI::begin() //inicjalne rysowanie z przykryciem tła
    {
-   
+    
 	   _lcd->setColor(0,0,0);
 	   _lcd->fillRect(_x, _y, _x1, _y1);
+     for(int i=0;i<BMP_ILE;i++)
+    {
+      wentBtn[i]=new CButtonWnd(_lcd,i,_x+bmpX[i],_y+bmpY[i],35,35,(char*)bmpNorm[i],(char*)bmpAktyw[i]);
+      wentBtn[i]->zmienStan(BTN_STAN_AKTYWNY);
+      
+    }
 	   Rysuj(0,0,CWentGUI_PWM_stop);
    }
    void CWentGUI::Rysuj(uint8_t pwmNawiew,uint8_t pwmWywiew, uint8_t tryb)
    {
 	   if(pwmNawiew==_pozNawiew &&pwmWywiew==_pozWywiew&& tryb==_tryb)
 	   {
-		   if(millis()-_ms>2000) // jesli dawno nie bylo odswiezenia to przerysuj
+		   if(millis()-_ms>20000) // jesli dawno nie bylo odswiezenia to przerysuj
 		   {						//mimo wszystko
 			   _ms=millis();
 			   
@@ -30,64 +36,76 @@ void   CWentGUI::begin() //inicjalne rysowanie z przykryciem tła
 		_pozNawiew=pwmNawiew; _pozWywiew=pwmWywiew; _tryb=tryb;
 		
 		
-		/////////// wybor bitmap do malowania /////////////
-	   bool bmpStatus[BMP_ILE];
-	   for(int i=0;i<BMP_ILE;i++)
-	   {
-		   if(_pozNawiew==pwmPoz[i])
-			    bmpStatus[i]=true;
-		   else
-				bmpStatus[i]=false;
-	   }
-	   if(_pozNawiew>_pozWywiew) 
-	   {
-		   bmpStatus[BMP_kominek]=true;
-	   }
-	   
-	   if(_tryb==CWentGUI_PWM_auto)
-	   {
-		   bmpStatus[BMP_wiatrak]=true;
-	   }
-	   
-	   for(int i=0;i<BMP_ILE;i++)
-	   {
-		  if( bmpStatus[i])
-		   {
-		//    showBMP(bmpAktyw[i],_x+bmpX[i],_y+bmpY[i]);
-		    } 
-		else 
-{		   
-  //showBMP(bmpNorm[i],_x+bmpX[i],_y+bmpY[i]);
-  }
-	   }
+	
 	   
 	   /////////////////////////////////////////////
 	   /////////// rysowanie wskazowki zegara /////////////
 	  
 	   uint16_t maxRN= map(_pozNawiew, 0, 100, 0, 270);
 	   uint16_t maxRW= map(_pozWywiew, 0, 100, 0, 270);
+    maxRN=50;///tylko do debuga
+    maxRW=70;
+    Serial.print("RN=");Serial.print(maxRN);
+    Serial.print("RW=");Serial.println(maxRW);
 	   ///ramka
-	   _lcd->setColor(255,255,255);
-	   _lcd->drawMidpointCircle(_cx,_cy,_r,0, 270); 
-	   _lcd->drawMidpointCircle(_cx,_cy,_r+_gr,0, 270); 
+      _lcd->setColor(70,70,70);
+	  
+	
+    _lcd->drawArc(_x+_cx,_y+_cy,_r,0,270);
+    _lcd->drawArc(_x+_cx,_y+_cy,_r+_gr,0,270);
+     _lcd->drawLine(_x,     _y+_cy,_x+_cx,_y+_cy);//pozioma wskazowka
+     _lcd->drawLine(_x+_cx,_y     ,_x+_cx,_y+_cy); //pionowa wskazowka
 		  
 		//wypełnienie
-		for(uint8_t i=0;i<_gr;i++)
-		{
-			_lcd->drawMidpointCircle(_cx,_cy,i,0, maxRN); 
-		}
+
+//pomysl nowy zmienic na gruby łuk biały w zakresie od 0 do mniejszej wartosci wiatraka oraz od mniejszej do wiekszej w kolorze czerw/nieb
+
 		//niby maksymalny zakres
-		_lcd->setColor(20,20,20); 
-		for(uint8_t i=0;i<_gr;i++)
-		{		
-			_lcd->drawMidpointCircle(_cx,_cy,i,270, 300); 
-		}			
+		// _lcd->setColor(255,255,255);
+    _lcd->setColor(90,90,255); //nawiew zimny niebieski
+         _lcd->drawArc(_x+_cx,_y+_cy,_r,0,maxRN,_gr);
+	 			 
 		//koncowka drugiego wentyla
-		_lcd->setColor(255,0,0); 
-		for(uint8_t i=0;i<_gr;i++)
-		{
-			_lcd->drawMidpointCircle(_cx,_cy,_r,maxRW-1, maxRW+1); 
-		}
+		_lcd->setColor(255,90,90); 
+	
+   _lcd->drawArc(_x+_cx,_y+_cy,_r,maxRN,maxRW,_gr);
+ 
+  // _lcd->setColor(0,0,255);
+  // _lcd->drawRect(_x,_y,_x1,_y1);// ramka debigowa
+
+  /////////// wybor bitmap do malowania /////////////
+     bool bmpStatus[BMP_ILE];
+     for(int i=0;i<BMP_ILE;i++)
+     {
+       if(_pozNawiew==pwmPoz[i])
+          bmpStatus[i]=true;
+       else
+        bmpStatus[i]=false;
+     }
+     if(_pozNawiew>_pozWywiew) 
+     {
+       bmpStatus[BMP_kominek]=true;
+     }
+     
+     if(_tryb==CWentGUI_PWM_auto)
+     {
+       bmpStatus[BMP_wiatrak]=true;
+     }
+     
+     for(int i=0;i<BMP_ILE;i++)
+     {
+      if( bmpStatus[i])
+       {
+         wentBtn[i]->zmienStan(BTN_STAN_AKTYWNY_WYBRANY);
+    //    showBMP(bmpAktyw[i],_x+bmpX[i],_y+bmpY[i]);
+        } 
+    else 
+{       wentBtn[i]->zmienStan(BTN_STAN_AKTYWNY);
+  //showBMP(bmpNorm[i],_x+bmpX[i],_y+bmpY[i]);
+  }
+  wentBtn[i]->Rysuj();
+     }
+   
    }
    uint16_t CWentGUI::czyKlik(uint16_t x,uint16_t y)
    {

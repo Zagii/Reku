@@ -7,10 +7,10 @@
 #include "CLcd.h"
 
 
-#define STAN_AKTYWNY 0
-#define STAN_NIEAKTYWNY 1
-#define STAN_AKTYWNY_WYBRANY 2
-#define STAN_UKRYTY 3
+#define BTN_STAN_AKTYWNY 0
+#define BTN_STAN_NIEAKTYWNY 1
+#define BTN_STAN_AKTYWNY_WYBRANY 2
+#define BTN_STAN_UKRYTY 3
 
 #define TYP_UNDF 0
 #define TYP_TEXT 1

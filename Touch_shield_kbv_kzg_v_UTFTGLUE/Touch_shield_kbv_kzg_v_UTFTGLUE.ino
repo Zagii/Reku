@@ -73,6 +73,7 @@ void setup(void)
    attachInterrupt(digitalPinToInterrupt( wiatraki[WIATRAK_OUT].dajISR()), isrOUT, RISING );
    wiatraki[WIATRAK_IN].begin();
    wiatraki[WIATRAK_OUT].begin();
+   Serial.println("koniec setup glowny");
 }
 void isrIN()
 {

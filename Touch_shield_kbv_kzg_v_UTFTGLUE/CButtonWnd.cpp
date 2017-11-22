@@ -11,7 +11,7 @@ CButtonWnd::CButtonWnd(CLcd* lcd,  uint8_t id, uint16_t x, uint16_t y, uint16_t 
   _x1=x+w;
   _y1=y+h;
   strcpy(_txt,txt);
-  _stan=STAN_AKTYWNY;
+  _stan=BTN_STAN_AKTYWNY;
   _lcd=lcd;
   _typ=TYP_TEXT;
 }
@@ -25,7 +25,7 @@ CButtonWnd::CButtonWnd(CLcd* lcd,  uint8_t id, uint16_t x, uint16_t y, uint16_t 
   _x1=x+w;
   _y1=y+h;
   strcpy(_txt,"");
-  _stan=STAN_AKTYWNY;
+  _stan=BTN_STAN_AKTYWNY;
   _lcd=lcd;
   _bmpAktyw=bmpAktyw;
   _bmpAktywWybr=bmpAktywWybr;
@@ -41,22 +41,24 @@ CButtonWnd::CButtonWnd(CLcd* lcd,  uint8_t id, uint16_t x, uint16_t y, uint16_t 
   _x1=x+w;
   _y1=y+h;
   strcpy(_txt,"");
-  _stan=STAN_AKTYWNY;
+  _stan=BTN_STAN_AKTYWNY;
   _lcd=lcd;
   _bmpAktywStr=bmpAktyw;
   _bmpAktywWybrStr=bmpAktywWybr;
   _typ=TYP_BMP_str;
+
+  Serial.println("koniec konstruktora CButtonWnd");
 }
 void CButtonWnd:: Rysuj()//( MCUFRIEND_kbv* tft )
 {
-	if(_stan==STAN_UKRYTY)
+	if(_stan==BTN_STAN_UKRYTY)
 	{
 		return;
 	}
 	switch(_typ)
 	{	  
 		case TYP_TEXT:
-			if(_stan==STAN_AKTYWNY)
+			if(_stan==BTN_STAN_AKTYWNY)
 			{
 				_lcd->setColor(0,0,255);
 			}
@@ -83,13 +85,13 @@ void CButtonWnd:: Rysuj()//( MCUFRIEND_kbv* tft )
 		case TYP_BMP:
 			switch(_stan)
 			{
-			case STAN_AKTYWNY:
+			case BTN_STAN_AKTYWNY:
 				_lcd->drawBitmap(_x,_y,_w,_h,_bmpAktyw);
 				break;
-			case STAN_AKTYWNY_WYBRANY:
+			case BTN_STAN_AKTYWNY_WYBRANY:
 				_lcd->drawBitmap(_x,_y,_w,_h,_bmpAktywWybr);
 				break;
-			case STAN_NIEAKTYWNY:
+			case BTN_STAN_NIEAKTYWNY:
 				_lcd->setColor(200,200,255);
 				_lcd->fillRoundRect(_x, _y, _x1, _y1);
 				break;
@@ -98,13 +100,13 @@ void CButtonWnd:: Rysuj()//( MCUFRIEND_kbv* tft )
 		case TYP_BMP_str:
 			switch(_stan)
 			{
-			case STAN_AKTYWNY:
+			case BTN_STAN_AKTYWNY:
 				_lcd->showBMP(_bmpAktywStr,_x,_y);
 				break;
-			case STAN_AKTYWNY_WYBRANY:
+			case BTN_STAN_AKTYWNY_WYBRANY:
 				_lcd->showBMP(_bmpAktywWybrStr, _x,_y);
 				break;
-			case STAN_NIEAKTYWNY:
+			case BTN_STAN_NIEAKTYWNY:
 				_lcd->setColor(200,200,255);
 				_lcd->fillRoundRect(_x, _y, _x1, _y1);
 				break;
@@ -170,6 +172,7 @@ void CButtonWnd:: Rysuj()//( MCUFRIEND_kbv* tft )
 }
 void CButtonWnd::zmienStan(uint8_t stan)
 {
+  if(stan==_stan)return;
   _stan=stan;
   Rysuj();
 }

@@ -12,13 +12,13 @@ CEkran::CEkran(CLcd *lcd,uint8_t ekranID,rozkazJson rozkazCallBack)
 	// tworzy buttony menu dolnego
 	for(int i=0;i<ILE_MENU_BTN;i++)
 	{
-		menuDolBtn[i]=new CButtonWnd(_lcd,i,i*45+4+i*25,190,45,45,(char*)plikiBMP_B,(char*)plikiBMP_Z);
+		menuDolBtn[i]=new CButtonWnd(_lcd,i,i*45+4+i*25,190,45,45,(char*)plikiBMP_B[i],(char*)plikiBMP_Z[i]);
 		if(i==_ekranID)
-			menuDolBtn[i]->zmienStan(STAN_AKTYWNY_WYBRANY);
+			menuDolBtn[i]->zmienStan(BTN_STAN_AKTYWNY_WYBRANY);
 		else
-			menuDolBtn[i]->zmienStan(STAN_AKTYWNY);
+			menuDolBtn[i]->zmienStan(BTN_STAN_AKTYWNY);
 	}
-  
+  Serial.println("koniec konstruktora CEkran");
 };
 
 void CEkran::RysujZTlem(CWiatrak wiatraki[], CKomora komory[])
@@ -30,7 +30,7 @@ void CEkran::RysujZTlem(CWiatrak wiatraki[], CKomora komory[])
 void CEkran::RysujMenuGora(CWiatrak wiatraki[], CKomora komory[])
 {
 	//kreska oddzielajaca
-	_lcd->setColor(0x000000);
+	_lcd->setColor(255,0,0);
 	_lcd->drawLine(0,25,320,25);
 }
 
@@ -77,6 +77,7 @@ return false;
 }
  void CEkranInfo::begin()
 {
-	_wentGUI= new CWentGUI(_lcd,   190, 40);
+	_wentGUI= new CWentGUI(_lcd,   175, 26);
 	_wentGUI->begin();
+  Serial.println("koniec begin CEkranInfo");
 }
