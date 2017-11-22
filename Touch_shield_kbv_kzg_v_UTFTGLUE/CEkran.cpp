@@ -1,8 +1,8 @@
 
 #include "CEkran.h"
 
-const char *plikiBMP_B[] = {"iB.bmp","dB.bmp","mB.bmp","iP.bmp"};
-const char *plikiBMP_Z[] = {"iZ.bmp","dZ.bmp","mZ.bmp","iZ.bmp"};
+ char *plikiBMP_B[] = {"iB.bmp","dB.bmp","mB.bmp","iP.bmp"};
+ char *plikiBMP_Z[] = {"iZ.bmp","dZ.bmp","mZ.bmp","iZ.bmp"};
 
 CEkran::CEkran(CLcd *lcd,uint8_t ekranID,rozkazJson rozkazCallBack)
 {
@@ -12,7 +12,7 @@ CEkran::CEkran(CLcd *lcd,uint8_t ekranID,rozkazJson rozkazCallBack)
 	// tworzy buttony menu dolnego
 	for(int i=0;i<ILE_MENU_BTN;i++)
 	{
-		menuDolBtn[i]=new CButtonWnd(_lcd,i,i*45+4+i*25,190,45,45,(const char*)plikiBMP_B,(const char*)plikiBMP_Z);
+		menuDolBtn[i]=new CButtonWnd(_lcd,i,i*45+4+i*25,190,45,45,(char*)plikiBMP_B,(char*)plikiBMP_Z);
 		if(i==_ekranID)
 			menuDolBtn[i]->zmienStan(STAN_AKTYWNY_WYBRANY);
 		else

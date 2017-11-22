@@ -47,7 +47,7 @@ class CButtonWnd
     CButtonWnd(){_typ=TYP_UNDF;_id=0;};
     CButtonWnd(CLcd* lcd,  uint8_t id, uint16_t x, uint16_t y, uint16_t w, uint16_t h,char *txt);
 	CButtonWnd(CLcd* lcd,  uint8_t id, uint16_t x, uint16_t y, uint16_t w, uint16_t h,uint16_t *bmpAktyw,uint16_t *bmpAktywWybr);
-	CButtonWnd(CLcd* lcd,  uint8_t id, uint16_t x, uint16_t y, uint16_t w, uint16_t h,const char* bmpAktyw,const char *bmpAktywWybr);
+	CButtonWnd(CLcd* lcd,  uint8_t id, uint16_t x, uint16_t y, uint16_t w, uint16_t h, char* bmpAktyw, char *bmpAktywWybr);
     void Rysuj();
     unsigned long  czyKlik(uint16_t x,uint16_t y);
     void zmienStan(uint8_t stan);

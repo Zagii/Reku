@@ -92,7 +92,7 @@ char* zrobJson(uint8_t paramName, uint16_t paramValue)
 	array.add(paramName);
 	array.add(paramValue);
     rozkazyTab.add(array);
-	rozkazyTab.printTo(rozkazStr);
+	rozkazyTab.printTo((char*)rozkazStr, rozkazyTab.measureLength() + 1);
   
 
   return rozkazStr;

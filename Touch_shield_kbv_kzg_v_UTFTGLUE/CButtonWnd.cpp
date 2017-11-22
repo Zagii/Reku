@@ -31,7 +31,7 @@ CButtonWnd::CButtonWnd(CLcd* lcd,  uint8_t id, uint16_t x, uint16_t y, uint16_t 
   _bmpAktywWybr=bmpAktywWybr;
   _typ=TYP_BMP;
 }
-CButtonWnd::CButtonWnd(CLcd* lcd,  uint8_t id, uint16_t x, uint16_t y, uint16_t w, uint16_t h,const char* bmpAktyw,const char *bmpAktywWybr)
+CButtonWnd::CButtonWnd(CLcd* lcd,  uint8_t id, uint16_t x, uint16_t y, uint16_t w, uint16_t h, char* bmpAktyw, char *bmpAktywWybr)
 {
   _id=id;
   _x=x;
