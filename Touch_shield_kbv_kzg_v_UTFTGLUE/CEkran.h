@@ -17,10 +17,9 @@ class CLcd;
 class CButtonWnd;
 class CWiatrak;
 class CKomora;
-//class json;
+class CWentGUI;
 
-const char *plikiBMP_B[] = {"iB.bmp","dB.bmp","mB.bmp","iP.bmp"};
-const char *plikiBMP_Z[] = {"iZ.bmp","dZ.bmp","mZ.bmp","iZ.bmp"};
+
 
 class CEkran
 {

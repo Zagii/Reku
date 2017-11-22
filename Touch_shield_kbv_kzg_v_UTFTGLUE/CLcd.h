@@ -13,7 +13,7 @@
 
 typedef char*( * rozkazJson )( uint8_t,uint16_t);
 
-#include "CButtonWnd.h"
+//#include "CButtonWnd.h"
 #include "CWiatrak.h"
 #include "CKomora.h"
 #include "CWentGUI.h"
@@ -89,7 +89,7 @@ class CLcd:public UTFTGLUE
   TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
   TSPoint tp;
 bool przerysujEkran=true;
- uint8_t ekran=0;
+ uint8_t _ekran=0;
    uint8_t aw=0;
   // most mcufriend shields use these pins and Portrait mode:
   uint8_t YP = A1;  // must be an analog pin, use "An" notation!
@@ -116,7 +116,7 @@ rozkazJson _rozkazCallBack;
   void kopnietyKwadrat(uint16_t x, uint16_t y, uint16_t x2, uint16_t y2, uint16_t g,int przesunX, int przesunY);
  
   void stary_loop();
-  uint8_t loop( CWiatrak Wiatraki[], CKomora Komory[],rozkazJson rozkazCallBack);//return czy jest rozkaz od uzytkownika lcd?
+  uint8_t loop( CWiatrak Wiatraki[], CKomora Komory[]);//return czy jest rozkaz od uzytkownika lcd?
   void show_Serial(void);
 
   void RysujMenuDol();

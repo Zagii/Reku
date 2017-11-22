@@ -118,7 +118,7 @@ void CLcd::show_Serial(void)
 void CLcd::initGUI()
 {
 ///////////////////////// init ekranow
-ekranInfo=new CEkranInfo(_lcd,EKRAN_INFO);
+ekranInfo=new CEkranInfo(this,EKRAN_INFO,_rozkazCallBack);
 ekrany[EKRAN_INFO]=ekranInfo;
 ekrany[EKRAN_INFO]->begin();
 
@@ -130,17 +130,17 @@ zmienEkran(EKRAN_INFO);
  
  void CLcd::zmienEkran(uint8_t e)
  {
-  ekran=e;
+  _ekran=e;
   przerysujEkran=true;
  }
  
   uint8_t CLcd::loop(CWiatrak Wiatraki[], CKomora Komory[])
   {
 	if(przerysujEkran)
-		  ekrany[e]->RysujZTlem(Wiatraki,Komory);
+		  ekrany[_ekran]->RysujZTlem(Wiatraki,Komory);
 	if(touch()==1)// byl touch
 	{
-		return ekrany[e]->Touch(xpos,ypos);
+		return ekrany[_ekran]->Touch(xpos,ypos);
 				
 	}
   }
@@ -206,7 +206,7 @@ uint8_t CLcd::showBMP(char *nm, int x, int y)
     uint16_t n;                 // blocks read
     uint8_t ret;
 
-    if ((x >= tft.width()) || (y >= tft.height()))
+    if ((x >= width()) || (y >= height()))
         return 1;               // off screen
 
     bmpFile = SD.open(nm);      // Parse BMP header
@@ -235,10 +235,10 @@ uint8_t CLcd::showBMP(char *nm, int x, int y)
 
         w = bmpWidth;
         h = bmpHeight;
-        if ((x + w) >= tft.width())       // Crop area to be loaded
-            w = tft.width() - x;
-        if ((y + h) >= tft.height())      //
-            h = tft.height() - y;
+        if ((x + w) >= width())       // Crop area to be loaded
+            w = width() - x;
+        if ((y + h) >= height())      //
+            h = height() - y;
 
         if (bmpDepth <= PALETTEDEPTH) {   // these modes have separate palette
             bmpFile.seek(BMPIMAGEOFFSET); //palette is always @ 54
@@ -291,7 +291,7 @@ uint8_t CLcd::showBMP(char *nm, int x, int y)
                             b = sdbuffer[buffidx++];
                             g = sdbuffer[buffidx++];
                             r = sdbuffer[buffidx++];
-                            color = tft.color565(r, g, b);
+                            color = color565(r, g, b);
                             break;
                         case 16:
                             b = sdbuffer[buffidx++];
@@ -314,7 +314,7 @@ uint8_t CLcd::showBMP(char *nm, int x, int y)
                     lcdbuffer[lcdidx] = color;
 
                 }
-                tft.pushColors(lcdbuffer, lcdidx, first);
+                pushColors(lcdbuffer, lcdidx, first);
                 first = false;
                 col += lcdidx;
             }           // end cols

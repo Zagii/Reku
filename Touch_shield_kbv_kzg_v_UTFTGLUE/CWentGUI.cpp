@@ -77,13 +77,13 @@ void   CWentGUI::begin() //inicjalne rysowanie z przykryciem tła
 			_lcd->drawMidpointCircle(_cx,_cy,i,0, maxRN); 
 		}
 		//niby maksymalny zakres
-		_tft->setColor(20,20,20); 
+		_lcd->setColor(20,20,20); 
 		for(uint8_t i=0;i<_gr;i++)
 		{		
 			_lcd->drawMidpointCircle(_cx,_cy,i,270, 300); 
 		}			
 		//koncowka drugiego wentyla
-		_tft->setColor(255,0,0); 
+		_lcd->setColor(255,0,0); 
 		for(uint8_t i=0;i<_gr;i++)
 		{
 			_lcd->drawMidpointCircle(_cx,_cy,_r,maxRW-1, maxRW+1); 

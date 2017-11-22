@@ -3,7 +3,7 @@
  * MCUFRIEND_kbv.h ->https://github.com/prenticedavid/MCUFRIEND_kbv 
  * touchscreen.h -> https://github.com/adafruit/Touch-Screen-Library
  * Adafruit_GFX.h -> def arduino
- * SdFat.h -> def arduino https://github.com/greiman/SdFat
+ * SdFat.h -> def arduino https://github.com/greiman/SdFat trzeba tez zmienic flage na soft spi w bibliotece konfiguracji
  * 
  * 
  */
@@ -20,7 +20,7 @@
 #include "CLcd.h"
 #include "CWiatrak.h"
 #include "CKomora.h"
-#include "CWentGUI.h"
+//#include "CWentGUI.h"
 
 #define WIATRAK_IN 0
 #define WIATRAK_OUT 1
@@ -93,9 +93,9 @@ char* zrobJson(uint8_t paramName, uint16_t paramValue)
 	array.add(paramValue);
     rozkazyTab.add(array);
 	rozkazyTab.printTo(rozkazStr);
-  }
+  
 
-  return root;
+  return rozkazStr;
 }
 void loop()
 {
