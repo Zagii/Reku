@@ -1,0 +1,32 @@
+// synchronizacja zmian z serwerem ale tylko historia zmian bez modyfikacji plikow
+git fetch origin
+
+// pobranie aktualizacji z serwera czyli odpowiada to poleceniom git fech+git merge
+git pull
+
+// prze³¹czanie sie  na inna ga³¹Ÿ 
+git checkout nazwa ga³êzi
+
+//tworzenie nowej ga³êzi tworzenie nowej ga³êzi na bazie ga³êzi zdalnej bez podania zdalnej tworzy tylko lokaln¹ kopiê
+git checkout -b serverfix origin/serverfix
+
+// mergowanie ga³êzi aktualnej z inna (najpierw trzeba sie na nia przelaczyc checkoutem)
+git merge inna_galaz
+
+// zatwierdzenie zmian lokalnie
+git commit -a -m 'txt...'
+
+/// wypychanie zmian na serwer do galezi serverfix
+git push origin serverfix
+
+
+//usuwanie lokalnej ga³êzi po scaleniu
+git branch -d nazwa_galezi
+
+//usuwanie zdalnej ga³êzi na serwerze o nazwie serverfix
+git push origin :serverfix
+
+
+// podglad statusu 
+git status
+
