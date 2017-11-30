@@ -20,13 +20,16 @@
 #define CWentGUI_PWM_impreza 50
 #define CWentGUI_PWM_turbo 70
 #define CWentGUI_PWM_max 100
+#define CWentGUI_PWM_kominek 101
+#define CWentGUI_PWM_rozmrazanie 102
 #define CWentGUI_PWM_auto 254
 
 static const char *bmpNorm[]= {"vB.bmp" ,"hB.bmp" ,"rB.bmp" ,"kB.bmp" ,"tB.bmp" ,"fB.bmp"	};
 static const char *bmpAktyw[]={"vZ.bmp", "hZ.bmp", "rZ.bmp", "kZ.bmp", "tZ.bmp", "fZ.bmp"};
 static const uint16_t bmpX[]= {		54		,	20	  ,		110	  ,		110	  ,		0	 ,	100		};
 static const uint16_t bmpY[]= {		62		,	8	  ,		8	  ,		118	  ,		120	 ,	170		};
-static const uint8_t pwmPoz[]={		254		,	10	  ,		30	  ,		50	  ,		70	 ,	254		}; //=254 nie dotyczy
+static const uint8_t pwmPoz[]={		CWentGUI_PWM_auto	,CWentGUI_PWM_wakacje,	CWentGUI_PWM_wakacje ,
+									CWentGUI_PWM_impreza,CWentGUI_PWM_turbo	 ,	CWentGUI_PWM_kominek}; 
 
 #define CWentGUI_ukryj 0
 #define CWentGUI_pokaz 1

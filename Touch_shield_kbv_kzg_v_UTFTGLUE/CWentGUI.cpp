@@ -58,17 +58,25 @@ void   CWentGUI::begin() //inicjalne rysowanie z przykryciem tła
 		  
 		//wypełnienie
 
-//pomysl nowy zmienic na gruby łuk biały w zakresie od 0 do mniejszej wartosci wiatraka oraz od mniejszej do wiekszej w kolorze czerw/nieb
+	//pomysl nowy zmienic na gruby łuk biały w zakresie od 0 do mniejszej wartosci wiatraka oraz od mniejszej do wiekszej w kolorze czerw/nieb
 
-		//niby maksymalny zakres
-		// _lcd->setColor(255,255,255);
-    _lcd->setColor(90,90,255); //nawiew zimny niebieski
-         _lcd->drawArc(_x+_cx,_y+_cy,_r,0,maxRN,_gr);
-	 			 
-		//koncowka drugiego wentyla
-		_lcd->setColor(255,90,90); 
-	
-   _lcd->drawArc(_x+_cx,_y+_cy,_r,maxRN,maxRW,_gr);
+	uint16_t tmp=maxRN;
+	if(maxRW>tmp)tmp=maxRW;
+	_lcd->setColor(255,255,255);
+	_lcd->drawArc(_x+_cx,_y+_cy,_r+_gr,0,tmp,_gr);
+
+	if(maxRN>maxRW)  /// jesli nawiew wieje mocniej to rysuj niebiesko
+	{
+		_lcd->setColor(90,90,255);
+		_lcd->drawArc(_x+_cx,_y+_cy,_r+_gr,tmp,maxRN,_gr);
+	}else	//jeśli nie to czerwony
+	{
+		 _lcd->setColor(255,90,90); 
+		 _lcd->drawArc(_x+_cx,_y+_cy,_r+_gr,tmp,maxRW,_gr);
+	}
+
+	///// koniec pomysłu :)
+
  
   // _lcd->setColor(0,0,255);
   // _lcd->drawRect(_x,_y,_x1,_y1);// ramka debigowa
@@ -109,14 +117,38 @@ void   CWentGUI::begin() //inicjalne rysowanie z przykryciem tła
    }
    uint16_t CWentGUI::czyKlik(uint16_t x,uint16_t y)
    {
-	   bool bmpKlik[BMP_ILE];
+	   // sprawdzenie ktore z buttonow zostaly nacisniete
+	   //bool bmpKlik[BMP_ILE];
+	   int kliknietyBtn=-1;
 	   for(int i=0;i<BMP_ILE;i++)
 	   {
-		   if(x>bmpX[i]&&x<bmpX[i]+40&&y>bmpX[y]&&y<bmpX[y]+40)bmpKlik[i]=true;
+		   //bmpKlik[i]=false;
+		   unsigned long bk=wentBtn[i]->czyKlik(x,y);
+		   if(bk!=KLIK_PUSZCZONY)
+		   {
+			  // bmpKlik[i]=true;
+			 
+			  kliknietyBtn=i;
+		   }
+		   
 	   }
+	
+	   // czy ktos nie kliknal w skale na kolku
 	   if(inCircle(x,y,_r)>0&&inCircle(x,y,_r+_gr)>0)
 	   {
 		   
+	   }
+	      // zapalenie stanow odpowiednich butonow
+	   for(int i=0;i<BMP_ILE;i++)
+	   {
+		   if(kliknietyBtn==i)
+		   {
+			   wentBtn[i]->zmienStan(BTN_STAN_AKTYWNY_WYBRANY);
+			  _tryb=pwmPoz[i];
+		   }else
+		   {
+			   wentBtn[i]->zmienStan(BTN_STAN_AKTYWNY);
+		   }
 	   }
    }
    void CWentGUI::zmienStan(uint8_t stan)
