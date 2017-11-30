@@ -13,14 +13,22 @@ CEkran::CEkran(CLcd *lcd,uint8_t ekranID,rozkazJson rozkazCallBack)
 	for(int i=0;i<ILE_MENU_BTN;i++)
 	{
 		menuDolBtn[i]=new CButtonWnd(_lcd,i,i*45+4+i*25,190,45,45,(char*)plikiBMP_B[i],(char*)plikiBMP_Z[i]);
-		if(i==_ekranID)
-			menuDolBtn[i]->zmienStan(BTN_STAN_AKTYWNY_WYBRANY);
-		else
-			menuDolBtn[i]->zmienStan(BTN_STAN_AKTYWNY);
+		
 	}
+  ZmienStanMenuDol(_ekranID);
   Serial.println("koniec konstruktora CEkran");
 };
-
+void CEkran::ZmienStanMenuDol(uint8_t naEkran)
+{
+  _ekranID=naEkran;
+    for(int i=0;i<ILE_MENU_BTN;i++)
+  {
+    if(i==_ekranID)
+      menuDolBtn[i]->zmienStan(BTN_STAN_AKTYWNY_WYBRANY);
+    else
+      menuDolBtn[i]->zmienStan(BTN_STAN_AKTYWNY);
+  }
+}
 void CEkran::RysujZTlem(CWiatrak wiatraki[], CKomora komory[])
 {
 	_lcd->clrScr();
@@ -66,11 +74,23 @@ void CEkran::RysujMenuDol()
 }
 
 
-  bool CEkranInfo::Touch(uint8_t x, uint8_t y)
+  bool CEkranInfo::Touch(uint16_t x, uint16_t y)
 {
 	// zmien wyswietlane GUI jesli w ramach tego samego ekranu
+  _wentGUI->Touch(x,y);
 	// tworzy rozkaz do obslugi w klasie rodzica
-	
+  int but=-1;
+	for(int i=0;i<ILE_MENU_BTN;i++)
+  {
+    unsigned long b=menuDolBtn[i]->czyKlik(x,y);
+    if(b==KLIK_WCISKANY)
+    {but=i;}
+  }
+  if(but>=0)
+  {
+    ZmienStanMenuDol(but);
+    _lcd->zmienEkran(but);
+  }
 	//czy trzeba przerysowac ekran?
 	
 return false;	

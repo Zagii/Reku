@@ -161,9 +161,9 @@ void CButtonWnd:: Rysuj()//( MCUFRIEND_kbv* tft )
 		break;
 	}
 	
-		Serial.print("#");Serial.print(_id);
-		Serial.print(" czyKlik "); Serial.print(x);
-		Serial.print(", "); Serial.println(y);
+	//	Serial.print("#");Serial.print(_id);
+	//	Serial.print(" czyKlik "); Serial.print(x);
+	//	Serial.print(", "); Serial.println(y);
 	
 		if(ret>0)return ret;
 		else return _klik;

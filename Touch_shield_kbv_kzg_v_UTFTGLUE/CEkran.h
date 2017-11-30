@@ -23,6 +23,7 @@ class CWentGUI;
 
 class CEkran
 {
+  protected:
 	///elementy menu gora
 	/// elementy menu dol
 	CButtonWnd* menuDolBtn[ILE_MENU_BTN];
@@ -49,10 +50,11 @@ class CEkran
 	void RysujZTlem(CWiatrak wiatraki[], CKomora komory[]);
 	void RysujMenuGora(CWiatrak wiatraki[], CKomora komory[]);
 	void RysujMenuDol();
+  void ZmienStanMenuDol(uint8_t naEkran);
 	//JsonObject& dajRozkaz{}{return jsonRozkaz;};
 	void ZrobRozkaz(uint8_t pwmNawiew, uint8_t pwmWywiew,uint8_t tryb);
 	virtual void  Rysuj(CWiatrak wiatraki[], CKomora komory[])=0;
-	virtual bool  Touch(uint8_t x, uint8_t y)=0;	//zwraca true jesli powstal rozkaz do obslugi dla petli glownej
+	virtual bool  Touch(uint16_t x, uint16_t y)=0;	//zwraca true jesli powstal rozkaz do obslugi dla petli glownej
 	virtual void begin()=0;
 };
 
@@ -62,7 +64,7 @@ class CEkranInfo: public CEkran
 	public:
 	CEkranInfo(CLcd *lcd,uint8_t _ekranID,rozkazJson rozkazCallBack):CEkran(lcd,_ekranID,rozkazCallBack){};
 	virtual void Rysuj(CWiatrak wiatraki[], CKomora komory[]);
-	virtual bool Touch(uint8_t x, uint8_t y);
+	virtual bool Touch(uint16_t x, uint16_t y);
   virtual void begin();
 };
 

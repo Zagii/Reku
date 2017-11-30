@@ -62,7 +62,7 @@ CButtonWnd * wentBtn[BMP_ILE];
    CWentGUI(CLcd *lcd,  uint16_t x, uint16_t y);
    void begin();
    void Rysuj(uint8_t pwmNawiew,uint8_t pwmWywiew,uint8_t tryb);
-   uint16_t  czyKlik(uint16_t x,uint16_t y);
+   int Touch(uint16_t x,uint16_t y);
    void zmienStan(uint8_t stan);
    uint8_t inCircle( uint16_t x, uint16_t y,uint8_t R );
 };
