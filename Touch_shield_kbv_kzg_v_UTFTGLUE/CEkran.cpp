@@ -77,7 +77,33 @@ void CEkran::RysujMenuDol()
   bool CEkranInfo::Touch(uint16_t x, uint16_t y)
 {
 	// zmien wyswietlane GUI jesli w ramach tego samego ekranu
-  _wentGUI->Touch(x,y);
+  int16_t retWent=_wentGUI->Touch(x,y);
+  if(retWent!=-1)	//czyli ze kliknieto w wiatrakGUI i trzeba to obsłuzyć
+  {
+	  if(retWent>=0 &&retWent<=100)
+	  {
+		  _rozkazCallBack(JSON_PWM_NAWIEW,retWent);  
+		  _rozkazCallBack(JSON_PWM_WYWIEW,retWent);
+	  }else
+	  {
+		  switch(retWent)
+		  {
+			  case CWentGUI_PWM_kominek:
+				_rozkazCallBack(JSON_KOMINEK,1);
+			  break;
+			  case CWentGUI_PWM_rozmrazanie:
+				_rozkazCallBack(JSON_ROZMRAZANIE_WIATRAKI,1);
+			  break;
+			  case CWentGUI_PWM_auto:
+				_rozkazCallBack(JSON_AUTO,1);
+			  break;
+			  default:
+				Serial.println("Nieznany tryb CEkranInfo::Touch");
+			  break;
+		  }
+	  }
+	return true;
+  }
 	// tworzy rozkaz do obslugi w klasie rodzica
   int but=-1;
 	for(int i=0;i<ILE_MENU_BTN;i++)

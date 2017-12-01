@@ -119,7 +119,15 @@ void   CWentGUI::begin() //inicjalne rysowanie z przykryciem tła
      }
    
    }
-   int CWentGUI::Touch(uint16_t x,uint16_t y)
+   
+   
+   /***************************************
+   *** zwraca wartosci ***********************
+   ** -1 gdy klikniecie bylo nie istotne
+   ** 0..100 nastaw ręczny PWM 
+   ** >100 gdy kliknieto w jeden z przycikow na wiatraku program predefiniowany
+   */
+   int16_t CWentGUI::Touch(uint16_t x,uint16_t y)
    {
 	   // sprawdzenie ktore z buttonow zostaly nacisniete
 	   //bool bmpKlik[BMP_ILE];
@@ -138,33 +146,24 @@ void   CWentGUI::begin() //inicjalne rysowanie z przykryciem tła
 	   }
 	
 	   // czy ktos nie kliknal w skale na kolku
-	   if(//inCircle(x,y,_r)>0&&
-	      inCircle(x,y,_r+_gr)>0)
+	   if(inCircle(x,y,_r)>0&& inCircle(x,y,_r+_gr)>0)
 	   {
-		   Serial.print("Kolko ");
-      
-      double xx=x-_cx-_x;
-      if(xx==0)xx=0.1;
-      double yy=y-_cy-_y;
-      if(yy==0)yy=0.1;
-      double at=yy/xx;
-      double dg=at*(57296 / 1000);
-      Serial.print(xx);Serial.print("; ");Serial.print(yy);Serial.print("; ");Serial.print(at);Serial.print(";");
-      double z=0;
-      if(xx<0)
-      {
-        if(yy<0)
-        {}
-        else
-        {}
-      }else
-      {
-        if(yy<0)
-        {}
-        else
-        {z+=90;}
-      }
-      Serial.println(dg);
+		  Serial.print("Kolko ");    
+		  double xx=x-_cx-_x;
+		  double yy=y-_cy-_y;
+		  double r2=xx*xx+yy*yy;
+		  double rs=sqrt(r2);
+		  if( rs>=_r && rs<=_r+_gr)
+		  {
+			double a=acos(yy/rs)*(57296 / 1000);
+			Serial.print(xx);Serial.print("; ");Serial.print(yy);Serial.print("; r= ");Serial.print(rs);Serial.print("; a=");
+			Serial.println(a);
+			int16_t ret= map(a, 0, 360, 0, 100);
+			Serial.print("; ret=");
+			Serial.println(ret);
+			ret=ret;
+			return ret;
+		  }    
 	   }
 
      //kliknieto gdzies poza guzikami i kolkiem nic nie rob
@@ -177,12 +176,13 @@ void   CWentGUI::begin() //inicjalne rysowanie z przykryciem tła
 		   if(kliknietyBtn==i)
 		   {
 			   wentBtn[i]->zmienStan(BTN_STAN_AKTYWNY_WYBRANY);
-			  _tryb=pwmPoz[i];
+			  
 		   }else
 		   {
 			   wentBtn[i]->zmienStan(BTN_STAN_AKTYWNY);
 		   }
 	   }
+	   return pwmPoz[i];
    }
    void CWentGUI::zmienStan(uint8_t stan)
    {
@@ -209,10 +209,10 @@ void   CWentGUI::begin() //inicjalne rysowanie z przykryciem tła
  //  Serial.print(dx*dx + dy*dy);
 //    Serial.print(" R2=");
  //  Serial.println(R*R);
-	  if(dx*dx + dy*dy <= R*R )
+//	  if(dx*dx + dy*dy <= R*R ) to zakomentowane bo chodzi tylko o wykluczenie nie istotnych, mnozenie i tak robie pozniej
 		return 1;
-	  else 
-		return 0;
+	//  else 
+		//return 0;
 	}
 
 
