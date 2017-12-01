@@ -42,6 +42,7 @@
 #define JSON_ROZMRAZANIE_WIATRAKI 'R'	//
 #define JSON_ROZMRAZANIE_GGWC 'G' //
 #define JSON_KOMINEK 'K' //
+#define JSON_AUTO 'A' //tryb automatycznego dobrania predkosci
 
 #define JSON_DL_ROZKAZU 150
 char rozkazStr[JSON_DL_ROZKAZU];
