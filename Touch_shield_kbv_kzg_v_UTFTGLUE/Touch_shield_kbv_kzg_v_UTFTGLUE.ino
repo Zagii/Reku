@@ -17,6 +17,17 @@
 #include <MCUFRIEND_kbv.h>
 #include <ArduinoJson.h>
 
+
+#define JSON_PWM_NAWIEW 'N'  // pwm wiatrak 1
+#define JSON_PWM_WYWIEW 'W'   // pwm wiatrak 2
+#define JSON_ROZMRAZANIE_WIATRAKI 'R' //
+#define JSON_ROZMRAZANIE_GGWC 'G' //
+#define JSON_KOMINEK 'K' //
+#define JSON_AUTO 'A' //tryb automatycznego dobrania predkosci
+
+#define JSON_DL_ROZKAZU 150
+char rozkazStr[JSON_DL_ROZKAZU];
+
 #include "CLcd.h"
 #include "CWiatrak.h"
 #include "CKomora.h"
@@ -37,15 +48,6 @@
 #define KOMORA_SZT 4
 #define WIATRAKI_SZT 2
 
-#define JSON_PWM_NAWIEW 'N'	// pwm wiatrak 1
-#define JSON_PWM_WYWIEW 'W'   // pwm wiatrak 2
-#define JSON_ROZMRAZANIE_WIATRAKI 'R'	//
-#define JSON_ROZMRAZANIE_GGWC 'G' //
-#define JSON_KOMINEK 'K' //
-#define JSON_AUTO 'A' //tryb automatycznego dobrania predkosci
-
-#define JSON_DL_ROZKAZU 150
-char rozkazStr[JSON_DL_ROZKAZU];
 
 char* zrobJson(uint8_t paramName, uint16_t paramValue);
 
