@@ -146,19 +146,27 @@ void   CWentGUI::begin() //inicjalne rysowanie z przykryciem tła
 	   }
 	
 	   // czy ktos nie kliknal w skale na kolku
-	   if(inCircle(x,y,_r)>0&& inCircle(x,y,_r+_gr)>0)
+	   if(//inCircle(x,y,_r)>0&& 
+	   inCircle(x,y,_r+_gr)>0)
 	   {
 		  Serial.print("Kolko ");    
-		  double xx=x-_cx-_x;
-		  double yy=y-_cy-_y;
+		  double xx=(double)x-(double)_cx-(double)_x;
+		  double yy=(double)y-(double)_cy-(double)_y;
+     
 		  double r2=xx*xx+yy*yy;
 		  double rs=sqrt(r2);
+     Serial.print(xx);Serial.print("; ");Serial.print(yy);Serial.print("; r= ");Serial.print(rs);
 		  if( rs>=_r && rs<=_r+_gr)
 		  {
-			double a=acos(yy/rs)*(57296 / 1000);
-			Serial.print(xx);Serial.print("; ");Serial.print(yy);Serial.print("; r= ");Serial.print(rs);Serial.print("; a=");
+      double a=0;
+     if(xx<0&&yy<0)a=360+asin(xx/rs)*(57296 / 1000); ///IV
+     if(xx>0&&yy<0)a=asin(xx/rs)*(57296 / 1000); //I
+     if(xx>0&&yy>0)a=180-asin(xx/rs)*(57296 / 1000);  // II
+     if(xx<0&&yy>0)a=180-asin(xx/rs)*(57296 / 1000);; //III
+     
+			Serial.print("; a=");
 			Serial.println(a);
-			int16_t ret= map(a, 0, 360, 0, 100);
+			int16_t ret= map(a, 0, 270, 0, 100);
 			Serial.print("; ret=");
 			Serial.println(ret);
 			ret=ret;
@@ -182,7 +190,7 @@ void   CWentGUI::begin() //inicjalne rysowanie z przykryciem tła
 			   wentBtn[i]->zmienStan(BTN_STAN_AKTYWNY);
 		   }
 	   }
-	   return pwmPoz[i];
+	   return pwmPoz[kliknietyBtn];
    }
    void CWentGUI::zmienStan(uint8_t stan)
    {
@@ -194,9 +202,13 @@ void   CWentGUI::begin() //inicjalne rysowanie z przykryciem tła
    
 	uint8_t CWentGUI::inCircle( uint16_t x, uint16_t y,uint8_t R )
 	{ //Serial.print("inCicle R=");
+
+ if(x>_x+_cx-R&&x<_x+_cx+R&&y>_y+_cy-R&&y<_y+_cy+R)return 1;
+ else
+ return 0;
  //Serial.print(R);Serial.print(" ");
 	  uint16_t dx = abs(x-_cx-_x);
-   Serial.println(dx);
+  // Serial.println(dx);
 	  if (    dx >  R ) return 0;
 	  uint16_t dy = abs(y-_cy-_y);
   // Serial.print(" ");Serial.print(dy);

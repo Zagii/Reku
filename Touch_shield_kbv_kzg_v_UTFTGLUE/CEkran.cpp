@@ -82,20 +82,20 @@ void CEkran::RysujMenuDol()
   {
 	  if(retWent>=0 &&retWent<=100)
 	  {
-		  _rozkazCallBack(JSON_PWM_NAWIEW,retWent);  
-		  _rozkazCallBack(JSON_PWM_WYWIEW,retWent);
+//		  _rozkazCallBack(JSON_PWM_NAWIEW,retWent);  
+	//	  _rozkazCallBack(JSON_PWM_WYWIEW,retWent);
 	  }else
 	  {
 		  switch(retWent)
 		  {
 			  case CWentGUI_PWM_kominek:
-				_rozkazCallBack(JSON_KOMINEK,1);
+		//		_rozkazCallBack(JSON_KOMINEK,1);
 			  break;
 			  case CWentGUI_PWM_rozmrazanie:
-				_rozkazCallBack(JSON_ROZMRAZANIE_WIATRAKI,1);
+			//	_rozkazCallBack(JSON_ROZMRAZANIE_WIATRAKI,1);
 			  break;
 			  case CWentGUI_PWM_auto:
-				_rozkazCallBack(JSON_AUTO,1);
+				//_rozkazCallBack(JSON_AUTO,1);
 			  break;
 			  default:
 				Serial.println("Nieznany tryb CEkranInfo::Touch");
