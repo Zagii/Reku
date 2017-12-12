@@ -155,7 +155,7 @@ void   CWentGUI::begin() //inicjalne rysowanie z przykryciem tła
      
 		  double r2=xx*xx+yy*yy;
 		  double rs=sqrt(r2);
-     Serial.print(xx);Serial.print("; ");Serial.print(yy);Serial.print("; r= ");Serial.print(rs);
+     // Serial.print(xx);Serial.print("; ");Serial.print(yy);Serial.print("; r= ");Serial.print(rs);
 		  if( rs>=_r && rs<=_r+_gr)
 		  {
       double a=0;
@@ -164,11 +164,9 @@ void   CWentGUI::begin() //inicjalne rysowanie z przykryciem tła
      if(xx>0&&yy>0)a=180-asin(xx/rs)*(57296 / 1000);  // II
      if(xx<0&&yy>0)a=180-asin(xx/rs)*(57296 / 1000);; //III
      
-			Serial.print("; a=");
-			Serial.println(a);
+			//Serial.print("; a=");Serial.println(a);
 			int16_t ret= map(a, 0, 270, 0, 100);
-			Serial.print("; ret=");
-			Serial.println(ret);
+			//Serial.print("; ret=");Serial.println(ret);
 			ret=ret;
 			return ret;
 		  }    

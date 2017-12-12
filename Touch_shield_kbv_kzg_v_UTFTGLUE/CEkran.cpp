@@ -78,24 +78,24 @@ void CEkran::RysujMenuDol()
 {
 	// zmien wyswietlane GUI jesli w ramach tego samego ekranu
   int16_t retWent=_wentGUI->Touch(x,y);
-  if(retWent!=-1)	//czyli ze kliknieto w wiatrakGUI i trzeba to obsłuzyć
+  if(retWent>0)	//czyli ze kliknieto w wiatrakGUI i trzeba to obsłuzyć
   {
-	  if(retWent>=0 &&retWent<=100)
+	  if(retWent>=0 &&retWent<=100)	//nastawy ogólne podane w % predkosci wiatrakow (4 biegi lub manual)
 	  {
-//		  _rozkazCallBack(JSON_PWM_NAWIEW,retWent);  
-	//	  _rozkazCallBack(JSON_PWM_WYWIEW,retWent);
+		  _rozkazCallBack(JSON_PWM_NAWIEW,retWent);  
+		  _rozkazCallBack(JSON_PWM_WYWIEW,retWent);
 	  }else
 	  {
 		  switch(retWent)
 		  {
 			  case CWentGUI_PWM_kominek:
-		//		_rozkazCallBack(JSON_KOMINEK,1);
+				_rozkazCallBack(JSON_KOMINEK,1);
 			  break;
 			  case CWentGUI_PWM_rozmrazanie:
-			//	_rozkazCallBack(JSON_ROZMRAZANIE_WIATRAKI,1);
+				_rozkazCallBack(JSON_ROZMRAZANIE_WIATRAKI,1);
 			  break;
 			  case CWentGUI_PWM_auto:
-				//_rozkazCallBack(JSON_AUTO,1);
+				_rozkazCallBack(JSON_AUTO,1);
 			  break;
 			  default:
 				Serial.println("Nieznany tryb CEkranInfo::Touch");
@@ -127,3 +127,143 @@ return false;
 	_wentGUI->begin();
   Serial.println("koniec begin CEkranInfo");
 }
+
+
+////////////////////////// ekran dashboard
+
+ void CEkranDashboard::Rysuj(CWiatrak wiatraki[], CKomora komory[])
+{
+	RysujMenuGora(wiatraki,komory);
+	_lcd->setColor(255,255,255);
+	_lcd->print("Tryb Dashboard",50, 100);
+	RysujMenuDol();
+	
+	
+}
+
+
+  bool CEkranDashboard::Touch(uint16_t x, uint16_t y)
+{
+	
+	
+	//////////////////////////////////////// menu dół
+	// tworzy rozkaz do obslugi w klasie rodzica
+  int but=-1;
+	for(int i=0;i<ILE_MENU_BTN;i++)
+  {
+    unsigned long b=menuDolBtn[i]->czyKlik(x,y);
+    if(b==KLIK_WCISKANY) {but=i;}
+  }
+  if(but>=0)
+  {
+    ZmienStanMenuDol(but);
+    _lcd->zmienEkran(but);
+  }
+	//czy trzeba przerysowac ekran?
+	
+return false;	
+}
+ void CEkranDashboard::begin()
+{
+  Serial.println("koniec begin CEkranDashboard");
+}
+
+////////////////////////// ekran CEkranDebug
+
+ void CEkranDebug::Rysuj(CWiatrak wiatraki[], CKomora komory[])
+{
+	//RysujMenuGora(wiatraki,komory);
+	_lcd->setColor(255,255,255);
+	_lcd->print("Tryb debug",100, 0);
+	uint16_t wysWiersza=20;
+	uint16_t szerKol=60;
+	
+	///// dane z zewnątrz
+	_lcd->print("Na zewnatrz",0,0 );
+	_lcd->print("T= ",0,1*wysWiersza );
+	_lcd->print("Wilg= ",0,2*wysWiersza );
+	_lcd->print("Cisn= ",0,3*wysWiersza );
+	_lcd->print("Powietrze ",0,4*wysWiersza );
+	//dane za filtrem czerpni
+	_lcd->print("Za filtrem",0,6*wysWiersza );
+	_lcd->print("Cisn= ",0,7*wysWiersza );
+	_lcd->print("Powietrze ",0,8*wysWiersza );
+	//dane za nagrzewnica ggwc
+	_lcd->print("Za nagrzewnica",szerKol,0 );
+	_lcd->print("T= ",szerKol,1*wysWiersza );
+	_lcd->print("Wilg= ",szerKol,2*wysWiersza );
+	_lcd->print("Cisn= ",szerKol,3*wysWiersza );
+	_lcd->print("Powietrze ",szerKol,4*wysWiersza );
+	// dane za wiatrakiem komora czerpnia
+	_lcd->print("Za wiatrakiem czerpni",szerKol,6*wysWiersza );
+	_lcd->print("T= ",szerKol,7*wysWiersza );
+	_lcd->print("Wilg= ",szerKol,8*wysWiersza );
+	_lcd->print("Cisn= ",szerKol,9*wysWiersza );
+	_lcd->print("Powietrze ",szerKol,10*wysWiersza );
+	// dane za wymiennikiem komora nawiew
+	_lcd->print("Za wymiennikiem - nawiew",szerKol,0 );
+	_lcd->print("T= ",2*szerKol,1*wysWiersza );
+	_lcd->print("Wilg= ",2*szerKol,2*wysWiersza );
+	_lcd->print("Cisn= ",2*szerKol,3*wysWiersza );
+	_lcd->print("Powietrze ",2*szerKol,4*wysWiersza );
+	// dane przed filtrem wywiew
+	_lcd->print("Przed filtrem wywiew",2*szerKol,6*wysWiersza );
+	_lcd->print("T= ",2*szerKol,7*wysWiersza );
+	_lcd->print("Wilg= ",2*szerKol,8*wysWiersza );
+	_lcd->print("Cisn= ",2* szerKol,9*wysWiersza );
+	_lcd->print("Powietrze ",2* szerKol,10*wysWiersza );
+	//dane za filtrem wywiew
+	_lcd->print("Za filtem - wywiew",3*szerKol,0 );
+	_lcd->print("T= ",3*szerKol,1*wysWiersza );
+	_lcd->print("Wilg= ",3*szerKol,2*wysWiersza );
+	_lcd->print("Cisn= ",3*szerKol,3*wysWiersza );
+	_lcd->print("Powietrze ",3*szerKol,4*wysWiersza );
+	//dane za wiatrakiem komora wywiew
+		_lcd->print("Za wiatrakiem - wywiew",3*szerKol,6*wysWiersza );
+	_lcd->print("T= ",3*szerKol,7*wysWiersza );
+	_lcd->print("Wilg= ",3*szerKol,8*wysWiersza );
+	_lcd->print("Cisn= ",3* szerKol,9*wysWiersza );
+	_lcd->print("Powietrze ",3* szerKol,10*wysWiersza );
+	//dane za wymiennikiem komora wyrzutnia
+	_lcd->print("Wyrzutnia",4*szerKol,0 );
+	_lcd->print("T= ",4*szerKol,1*wysWiersza );
+	_lcd->print("Wilg= ",4*szerKol,2*wysWiersza );
+	_lcd->print("Cisn= ",4*szerKol,3*wysWiersza );
+	
+	//no i przyciski
+	//wiatrak 1 (+/-), wiatrak 2(+/-), ggwc(+/- lub on off)
+	// tryby auto, kominek, rozmrazanie
+	//konfig delta kominek, delta rozmr wiatrakowe,
+	//czy jest ggwc
+	
+	RysujMenuDol();
+		
+}
+
+
+  bool CEkranDebug::Touch(uint16_t x, uint16_t y)
+{
+	
+	
+	//////////////////////////////////////// menu dół
+	// tworzy rozkaz do obslugi w klasie rodzica
+  int but=-1;
+	for(int i=0;i<ILE_MENU_BTN;i++)
+  {
+    unsigned long b=menuDolBtn[i]->czyKlik(x,y);
+    if(b==KLIK_WCISKANY) {but=i;}
+  }
+  if(but>=0)
+  {
+    ZmienStanMenuDol(but);
+    _lcd->zmienEkran(but);
+  }
+	//czy trzeba przerysowac ekran?
+	
+return false;	
+}
+ void CEkranDebug::begin()
+{
+  Serial.println("koniec begin CEkranDebug");
+}
+

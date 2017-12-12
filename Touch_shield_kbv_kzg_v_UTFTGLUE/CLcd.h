@@ -67,6 +67,8 @@ extern uint8_t SmallFont[];    //.kbv GLUE defines as GFXFont ref
 class CWentGUI;
 class CEkran;
 class CEkranInfo;
+class CEkranDashboard;
+class CEkranDebug;
  
 class CLcd:public UTFTGLUE
 {
@@ -103,6 +105,8 @@ uint16_t xpos=0, ypos=0;  //screen coordinates ostatni wykryty touch
  char* btn="test";
 
 CEkranInfo* ekranInfo;
+CEkranDashboard * ekranDashboard;
+CEkranDebug *ekranDebug;
 
 CEkran *ekrany[ILE_EKRANOW]; 
 uint16_t read16(File& f);
@@ -116,7 +120,7 @@ rozkazJson _rozkazCallBack;
   void kopnietyKwadrat(uint16_t x, uint16_t y, uint16_t x2, uint16_t y2, uint16_t g,int przesunX, int przesunY);
  
   void stary_loop();
-  uint8_t loop( CWiatrak Wiatraki[], CKomora Komory[]);//return czy jest rozkaz od uzytkownika lcd?
+  uint16_t loop( CWiatrak Wiatraki[], CKomora Komory[]);//return czy jest rozkaz od uzytkownika lcd?
   void show_Serial(void);
 
   void RysujMenuDol();

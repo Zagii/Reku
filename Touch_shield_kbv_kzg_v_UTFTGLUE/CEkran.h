@@ -5,6 +5,7 @@
 #include "CWiatrak.h"
 #include "CKomora.h"
 #include "CWentGUI.h"
+#include "Defy.h"
 
 #define ID_EKRAN_INFO 0
 #define ID_EKRAN_DASHBOARD 1
@@ -65,7 +66,27 @@ class CEkranInfo: public CEkran
 	CEkranInfo(CLcd *lcd,uint8_t _ekranID,rozkazJson rozkazCallBack):CEkran(lcd,_ekranID,rozkazCallBack){};
 	virtual void Rysuj(CWiatrak wiatraki[], CKomora komory[]);
 	virtual bool Touch(uint16_t x, uint16_t y);
-  virtual void begin();
+    virtual void begin();
+};
+
+class CEkranDashboard: public CEkran
+{
+
+	public:
+	CEkranDashboard(CLcd *lcd,uint8_t _ekranID,rozkazJson rozkazCallBack):CEkran(lcd,_ekranID,rozkazCallBack){};
+	virtual void Rysuj(CWiatrak wiatraki[], CKomora komory[]);
+	virtual bool Touch(uint16_t x, uint16_t y);
+    virtual void begin();
+};
+
+class CEkranDebug: public CEkran
+{
+
+	public:
+	CEkranDebug(CLcd *lcd,uint8_t _ekranID,rozkazJson rozkazCallBack):CEkran(lcd,_ekranID,rozkazCallBack){};
+	virtual void Rysuj(CWiatrak wiatraki[], CKomora komory[]);
+	virtual bool Touch(uint16_t x, uint16_t y);
+    virtual void begin();
 };
 
 #endif

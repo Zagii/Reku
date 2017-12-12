@@ -123,6 +123,12 @@ void CLcd::initGUI()
 ekranInfo=new CEkranInfo(this,EKRAN_INFO,_rozkazCallBack);
 ekrany[EKRAN_INFO]=ekranInfo;
 ekrany[EKRAN_INFO]->begin();
+ekranDashboard=new CEkranDashboard(this,EKRAN_DASHBOARD,_rozkazCallBack);
+ekrany[EKRAN_DASHBOARD]=ekranDashboard;
+ekrany[EKRAN_DASHBOARD]->begin();
+ekranDebug=new CEkranDebug(this,EKRAN_DEBUG,_rozkazCallBack);
+ekrany[EKRAN_DEBUG]=ekranDebug;
+ekrany[EKRAN_DEBUG]->begin();
 
 //////////////////////////////////
 zmienEkran(EKRAN_INFO);
@@ -132,12 +138,17 @@ zmienEkran(EKRAN_INFO);
  
  void CLcd::zmienEkran(uint8_t e)
  {
+	 if(e>ILE_EKRANOW)
+	 {
+		 Serial.println("Blad CLcd::zmienEkran nie ma tylu ekranow.");
+		 return;
+	 }
   _ekran=e;
   przerysujEkran=true;
   Serial.println("zmiana ekranu");
  }
  
-  uint8_t CLcd::loop(CWiatrak Wiatraki[], CKomora Komory[])
+  uint16_t CLcd::loop(CWiatrak Wiatraki[], CKomora Komory[])
   {
 	if(przerysujEkran)
 		 { 
