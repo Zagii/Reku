@@ -4,7 +4,7 @@
 #define TACHO_CZAS_SEK 3
 #define TACHO_CZAS_MS (TACHO_CZAS_SEK*1000)
 
-#define MAX_PWM 255
+#define MAX_PWM 150
 
 class CWiatrak
 {

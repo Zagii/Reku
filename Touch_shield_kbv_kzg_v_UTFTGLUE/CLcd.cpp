@@ -150,6 +150,7 @@ zmienEkran(EKRAN_INFO);
  
   uint16_t CLcd::loop(CWiatrak Wiatraki[], CKomora Komory[])
   {
+    ekrany[_ekran]->loop(Wiatraki,Komory);
 	if(przerysujEkran)
 		 { 
 		  ekrany[_ekran]->RysujZTlem(Wiatraki,Komory);
@@ -447,11 +448,13 @@ void CLcd::drawTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint
  drawLine(x3, y3, x1, y1);
 }
 
+
+
 void CLcd::fillTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t x3, uint16_t y3)
 {
   int32_t xs, xe;
   int16_t y, ly;
-
+/*  nie zdefiniowany swap trzeba go przerobic by użyć
   if (y1 > y2)
   {
     swap(y1, y2); 
@@ -467,7 +470,7 @@ void CLcd::fillTriangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint
     swap(y1, y2);
     swap(x1, x2);
   }
-  
+  */
   if(y1 == y3)  // Single line triangles
   {
     xs = xe = x1;

@@ -57,6 +57,7 @@ class CEkran
 	virtual void  Rysuj(CWiatrak wiatraki[], CKomora komory[])=0;
 	virtual bool  Touch(uint16_t x, uint16_t y)=0;	//zwraca true jesli powstal rozkaz do obslugi dla petli glownej
 	virtual void begin()=0;
+ virtual void loop(CWiatrak Wiatraki[], CKomora Komory[])=0;
 };
 
 class CEkranInfo: public CEkran
@@ -67,6 +68,7 @@ class CEkranInfo: public CEkran
 	virtual void Rysuj(CWiatrak wiatraki[], CKomora komory[]);
 	virtual bool Touch(uint16_t x, uint16_t y);
     virtual void begin();
+    virtual void loop(CWiatrak Wiatraki[], CKomora Komory[]);
 };
 
 class CEkranDashboard: public CEkran
@@ -77,6 +79,7 @@ class CEkranDashboard: public CEkran
 	virtual void Rysuj(CWiatrak wiatraki[], CKomora komory[]);
 	virtual bool Touch(uint16_t x, uint16_t y);
     virtual void begin();
+    virtual void loop(CWiatrak Wiatraki[], CKomora Komory[]);
 };
 
 class CEkranDebug: public CEkran
@@ -87,6 +90,7 @@ class CEkranDebug: public CEkran
 	virtual void Rysuj(CWiatrak wiatraki[], CKomora komory[]);
 	virtual bool Touch(uint16_t x, uint16_t y);
     virtual void begin();
+    virtual void loop(CWiatrak Wiatraki[], CKomora Komory[]);
 };
 
 #endif

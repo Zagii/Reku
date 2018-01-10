@@ -65,6 +65,8 @@ CButtonWnd * wentBtn[BMP_ILE];
    int16_t Touch(uint16_t x,uint16_t y);
    void zmienStan(uint8_t stan);
    uint8_t inCircle( uint16_t x, uint16_t y,uint8_t R );
+    void RysujBtn(uint8_t pwmNawiew,uint8_t pwmWywiew);
+     void RysujLuk(uint8_t pwmNawiew,uint8_t pwmWywiew);
 };
 
 

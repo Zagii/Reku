@@ -31,4 +31,5 @@ void CWiatrak::ustawPredkosc(uint8_t procent)
 	if(pwm>MAX_PWM)pwm=MAX_PWM;
 	analogWrite(_pin_pwm,pwm);
 	_zadanaPredkoscProcent=procent;
+ Serial.print("CWiatrak - Zadana predkosc wiatrak ");Serial.print(_pin_pwm);Serial.print(" ");Serial.println(procent);
 }

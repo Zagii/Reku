@@ -83,18 +83,38 @@ void isrOUT()
 }
 
 
-char* zrobJson(uint8_t paramName, uint16_t paramValue) 
+char* zrobJson2(uint8_t paramName, uint16_t paramValue) 
 {
 	StaticJsonBuffer<JSON_DL_ROZKAZU> jsonBuffer;
-	JsonArray& rozkazyTab = jsonBuffer.parseArray(rozkazStr);
-	JsonArray& array = jsonBuffer.createArray();
-	array.add(paramName);
-	array.add(paramValue);
-    rozkazyTab.add(array);
-	rozkazyTab.printTo((char*)rozkazStr, rozkazyTab.measureLength() + 1);
+	JsonArray& rT = jsonBuffer.parseArray(rozkazStr);
+	JsonArray& r = jsonBuffer.createArray();
+	r.add(paramName);
+	r.add(paramValue);
+    rT.add(r);
+	rT.printTo((char*)rozkazStr, rT.measureLength() + 1);
   
 
   return rozkazStr;
+}
+
+#define MAX_ROZKAZOW 10
+uint8_t ile_w_kolejce=0;
+uint16_t kolejkaRozkazow[MAX_ROZKAZOW][2];
+void dodajDoKolejki(uint16_t paramName,uint16_t paramValue)
+{
+  Serial.print("Dodaj do kolejki");
+  Serial.print(paramName);Serial.print(", ");Serial.println(paramValue);
+	if(ile_w_kolejce>=MAX_ROZKAZOW) return;
+	kolejkaRozkazow[ile_w_kolejce][0]=paramName;
+	kolejkaRozkazow[ile_w_kolejce][1]=paramValue;
+	ile_w_kolejce++;
+}
+
+
+char* zrobJson(uint8_t paramName, uint16_t paramValue) 
+{
+	dodajDoKolejki(paramName,paramValue);
+	return 0;
 }
 
 const byte numChars = 32;
@@ -142,6 +162,32 @@ void showNewData() {
 }
 
 
+void realizujRozkaz(uint16_t paramName,uint16_t paramValue) 
+{
+	switch(paramName)
+	{
+		case JSON_PWM_NAWIEW:
+			wiatraki[WIATRAK_IN].ustawPredkosc(paramValue);
+		break;
+		case JSON_PWM_WYWIEW:
+			wiatraki[WIATRAK_OUT].ustawPredkosc(paramValue);
+		break;
+		case JSON_ROZMRAZANIE_WIATRAKI: 
+			wiatraki[WIATRAK_IN].ustawPredkosc(15);
+			wiatraki[WIATRAK_OUT].ustawPredkosc(40);
+		break;
+		case JSON_ROZMRAZANIE_GGWC:
+		break;
+		case JSON_KOMINEK:
+			wiatraki[WIATRAK_IN].ustawPredkosc(50);
+			wiatraki[WIATRAK_OUT].ustawPredkosc(15);
+		break;
+		case JSON_AUTO:
+		break;		
+	}
+	
+}
+
 void loop()
 {
 	for(uint8_t i=0;i<KOMORA_SZT;i++)
@@ -162,11 +208,20 @@ void loop()
 		*/
 	}
 	/// odczytaj rozkaz z Seriala
-	 recvWithStartEndMarkers();
-    showNewData();
+	//recvWithStartEndMarkers();
+    //showNewData();
 	/// przetwarzanie rozkazu
 	
-
+	if(ile_w_kolejce>0)
+	{
+		for(int i=0;i<ile_w_kolejce;i++)
+		{
+      Serial.print("Jest w kolejce "); Serial.print(i); Serial.print("/");Serial.print(ile_w_kolejce);Serial.print(" ");
+    Serial.print(kolejkaRozkazow[i][0]);Serial.print(", ");Serial.println(kolejkaRozkazow[i][1]);
+			realizujRozkaz(kolejkaRozkazow[i][0],kolejkaRozkazow[i][1]);
+		}
+		ile_w_kolejce=0;
+	}
 }
 
 /*

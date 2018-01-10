@@ -47,7 +47,7 @@ CButtonWnd::CButtonWnd(CLcd* lcd,  uint8_t id, uint16_t x, uint16_t y, uint16_t 
   _bmpAktywWybrStr=bmpAktywWybr;
   _typ=TYP_BMP_str;
 
-  Serial.println("koniec konstruktora CButtonWnd");
+ // Serial.println("koniec konstruktora CButtonWnd");
 }
 void CButtonWnd:: Rysuj()//( MCUFRIEND_kbv* tft )
 {

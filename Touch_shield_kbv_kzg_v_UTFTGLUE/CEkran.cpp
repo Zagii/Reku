@@ -6,6 +6,8 @@
 
 CEkran::CEkran(CLcd *lcd,uint8_t ekranID,rozkazJson rozkazCallBack)
 {
+  Serial.print("start konstruktor CEkran " );
+  Serial.println(ekranID);
 	_lcd=lcd;
 	_ekranID=ekranID;
 	_rozkazCallBack=rozkazCallBack;
@@ -56,6 +58,10 @@ void CEkran::RysujMenuDol()
 
 
 //////////////////////////ekran info
+void CEkranInfo::loop(CWiatrak Wiatraki[], CKomora Komory[])
+{
+  _wentGUI->RysujLuk(Wiatraki[0].dajZadanaPredkoscProcent(),Wiatraki[1].dajZadanaPredkoscProcent());
+  }
  void CEkranInfo::Rysuj(CWiatrak wiatraki[], CKomora komory[])
 {
 	RysujMenuGora(wiatraki,komory);
@@ -80,10 +86,13 @@ void CEkran::RysujMenuDol()
   int16_t retWent=_wentGUI->Touch(x,y);
   if(retWent>0)	//czyli ze kliknieto w wiatrakGUI i trzeba to obsłuzyć
   {
+    //_lcd->przerysujEkran=true;
+    
 	  if(retWent>=0 &&retWent<=100)	//nastawy ogólne podane w % predkosci wiatrakow (4 biegi lub manual)
 	  {
 		  _rozkazCallBack(JSON_PWM_NAWIEW,retWent);  
 		  _rozkazCallBack(JSON_PWM_WYWIEW,retWent);
+    
 	  }else
 	  {
 		  switch(retWent)
@@ -114,7 +123,7 @@ void CEkran::RysujMenuDol()
   }
   if(but>=0)
   {
-    ZmienStanMenuDol(but);
+   // ZmienStanMenuDol(but);
     _lcd->zmienEkran(but);
   }
 	//czy trzeba przerysowac ekran?
@@ -130,7 +139,8 @@ return false;
 
 
 ////////////////////////// ekran dashboard
-
+void CEkranDashboard::loop(CWiatrak Wiatraki[], CKomora Komory[])
+{}
  void CEkranDashboard::Rysuj(CWiatrak wiatraki[], CKomora komory[])
 {
 	RysujMenuGora(wiatraki,komory);
@@ -169,7 +179,8 @@ return false;
 }
 
 ////////////////////////// ekran CEkranDebug
-
+ void CEkranDebug::loop(CWiatrak Wiatraki[], CKomora Komory[])
+ {}
  void CEkranDebug::Rysuj(CWiatrak wiatraki[], CKomora komory[])
 {
 	//RysujMenuGora(wiatraki,komory);
@@ -181,54 +192,54 @@ return false;
 	///// dane z zewnątrz
 	_lcd->print("Na zewnatrz",0,0 );
 	_lcd->print("T= ",0,1*wysWiersza );
-	_lcd->print("Wilg= ",0,2*wysWiersza );
-	_lcd->print("Cisn= ",0,3*wysWiersza );
-	_lcd->print("Powietrze ",0,4*wysWiersza );
+	_lcd->print("H= ",0,2*wysWiersza );
+	_lcd->print("P= ",0,3*wysWiersza );
+//	_lcd->print("Powietrze ",0,4*wysWiersza );
 	//dane za filtrem czerpni
 	_lcd->print("Za filtrem",0,6*wysWiersza );
-	_lcd->print("Cisn= ",0,7*wysWiersza );
-	_lcd->print("Powietrze ",0,8*wysWiersza );
+	_lcd->print("P= ",0,7*wysWiersza );
+	//_lcd->print("Powietrze ",0,8*wysWiersza );
 	//dane za nagrzewnica ggwc
 	_lcd->print("Za nagrzewnica",szerKol,0 );
 	_lcd->print("T= ",szerKol,1*wysWiersza );
-	_lcd->print("Wilg= ",szerKol,2*wysWiersza );
-	_lcd->print("Cisn= ",szerKol,3*wysWiersza );
-	_lcd->print("Powietrze ",szerKol,4*wysWiersza );
+	_lcd->print("H= ",szerKol,2*wysWiersza );
+	_lcd->print("P= ",szerKol,3*wysWiersza );
+	//_lcd->print("Powietrze ",szerKol,4*wysWiersza );
 	// dane za wiatrakiem komora czerpnia
 	_lcd->print("Za wiatrakiem czerpni",szerKol,6*wysWiersza );
 	_lcd->print("T= ",szerKol,7*wysWiersza );
-	_lcd->print("Wilg= ",szerKol,8*wysWiersza );
-	_lcd->print("Cisn= ",szerKol,9*wysWiersza );
-	_lcd->print("Powietrze ",szerKol,10*wysWiersza );
+	_lcd->print("H= ",szerKol,8*wysWiersza );
+	_lcd->print("P= ",szerKol,9*wysWiersza );
+	//_lcd->print("Powietrze ",szerKol,10*wysWiersza );
 	// dane za wymiennikiem komora nawiew
 	_lcd->print("Za wymiennikiem - nawiew",szerKol,0 );
 	_lcd->print("T= ",2*szerKol,1*wysWiersza );
-	_lcd->print("Wilg= ",2*szerKol,2*wysWiersza );
-	_lcd->print("Cisn= ",2*szerKol,3*wysWiersza );
-	_lcd->print("Powietrze ",2*szerKol,4*wysWiersza );
+	_lcd->print("H= ",2*szerKol,2*wysWiersza );
+	_lcd->print("P= ",2*szerKol,3*wysWiersza );
+	//_lcd->print("Powietrze ",2*szerKol,4*wysWiersza );
 	// dane przed filtrem wywiew
 	_lcd->print("Przed filtrem wywiew",2*szerKol,6*wysWiersza );
 	_lcd->print("T= ",2*szerKol,7*wysWiersza );
-	_lcd->print("Wilg= ",2*szerKol,8*wysWiersza );
-	_lcd->print("Cisn= ",2* szerKol,9*wysWiersza );
-	_lcd->print("Powietrze ",2* szerKol,10*wysWiersza );
+	_lcd->print("H= ",2*szerKol,8*wysWiersza );
+	_lcd->print("P= ",2* szerKol,9*wysWiersza );
+	//_lcd->print("Powietrze ",2* szerKol,10*wysWiersza );
 	//dane za filtrem wywiew
 	_lcd->print("Za filtem - wywiew",3*szerKol,0 );
 	_lcd->print("T= ",3*szerKol,1*wysWiersza );
-	_lcd->print("Wilg= ",3*szerKol,2*wysWiersza );
-	_lcd->print("Cisn= ",3*szerKol,3*wysWiersza );
-	_lcd->print("Powietrze ",3*szerKol,4*wysWiersza );
+	_lcd->print("H= ",3*szerKol,2*wysWiersza );
+	_lcd->print("P= ",3*szerKol,3*wysWiersza );
+	//_lcd->print("Powietrze ",3*szerKol,4*wysWiersza );
 	//dane za wiatrakiem komora wywiew
-		_lcd->print("Za wiatrakiem - wywiew",3*szerKol,6*wysWiersza );
+	_lcd->print("Za wiatrakiem - wywiew",3*szerKol,6*wysWiersza );
 	_lcd->print("T= ",3*szerKol,7*wysWiersza );
-	_lcd->print("Wilg= ",3*szerKol,8*wysWiersza );
-	_lcd->print("Cisn= ",3* szerKol,9*wysWiersza );
-	_lcd->print("Powietrze ",3* szerKol,10*wysWiersza );
+	_lcd->print("H= ",3*szerKol,8*wysWiersza );
+	_lcd->print("P= ",3* szerKol,9*wysWiersza );
+	//_lcd->print("Powietrze ",3* szerKol,10*wysWiersza );
 	//dane za wymiennikiem komora wyrzutnia
 	_lcd->print("Wyrzutnia",4*szerKol,0 );
 	_lcd->print("T= ",4*szerKol,1*wysWiersza );
-	_lcd->print("Wilg= ",4*szerKol,2*wysWiersza );
-	_lcd->print("Cisn= ",4*szerKol,3*wysWiersza );
+	_lcd->print("H= ",4*szerKol,2*wysWiersza );
+	_lcd->print("P= ",4*szerKol,3*wysWiersza );
 	
 	//no i przyciski
 	//wiatrak 1 (+/-), wiatrak 2(+/-), ggwc(+/- lub on off)
