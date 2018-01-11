@@ -8,4 +8,12 @@
 #define JSON_KOMINEK 'K' //
 #define JSON_AUTO 'A' //tryb automatycznego dobrania predkosci
 
+#define KOMORA_CZERPNIA 0
+#define KOMORA_WYRZUTNIA 1
+#define KOMORA_NAWIEW 2
+#define KOMORA_WYWIEW 3
+#define KOMORA_ZEWN 4
+#define KOMORA_SZT 4
+#define WIATRAKI_SZT 2
+
 #endif

@@ -133,7 +133,7 @@ if(pwmNawiew==_pozNawiew &&pwmWywiew==_pozWywiew)//&& tryb==_tryb)
    {
        Serial.print("CWentGUI -");Serial.print(pwmNawiew); Serial.print(", ");Serial.print(_pozNawiew);Serial.print(", ");
        Serial.print(pwmWywiew);Serial.print(", "); Serial.print(_pozWywiew);Serial.print(", ");Serial.print(tryb);Serial.print(", ");Serial.println(_tryb);
-	   
+	   _ms=millis()+22000;
 		
 		RysujLuk(pwmNawiew,pwmWywiew);
     RysujBtn(pwmNawiew,pwmWywiew);

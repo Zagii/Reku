@@ -207,11 +207,7 @@ uint32_t CLcd::read32(File& f) {
 
 uint8_t CLcd::showBMP(char *nm, uint16_t x, uint16_t y)
 {
-  Serial.print(nm);
-  Serial.print(" x=");
-   Serial.print(x);
-   Serial.print(" y=");
-    Serial.println(y);
+  //Serial.print(nm);  Serial.print(" x=");   Serial.print(x);   Serial.print(" y=");    Serial.println(y);
     File bmpFile;
     int bmpWidth, bmpHeight;    // W+H in pixels
     uint8_t bmpDepth;           // Bit depth (currently must be 24, 16, 8, 4, 1)

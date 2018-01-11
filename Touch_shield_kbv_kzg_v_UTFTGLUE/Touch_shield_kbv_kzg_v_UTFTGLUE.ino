@@ -18,6 +18,9 @@
 #include <ArduinoJson.h>
 
 
+#if !defined(BigFont)
+extern uint8_t BigFont[];    //.kbv GLUE defines as GFXFont ref
+#endif
 
 #define JSON_DL_ROZKAZU 150
 char rozkazStr[JSON_DL_ROZKAZU];
@@ -35,13 +38,7 @@ char rozkazStr[JSON_DL_ROZKAZU];
 #define PIN_WIATRAK_WYWIEW 45
 #define PIN_TACHO_WIATRAK_WYWIEW 20
 
-#define KOMORA_CZERPNIA 0
-#define KOMORA_WYRZUTNIA 1
-#define KOMORA_NAWIEW 2
-#define KOMORA_WYWIEW 3
-#define KOMORA_ZEWN 4
-#define KOMORA_SZT 4
-#define WIATRAKI_SZT 2
+
 
 
 char* zrobJson(uint8_t paramName, uint16_t paramValue);

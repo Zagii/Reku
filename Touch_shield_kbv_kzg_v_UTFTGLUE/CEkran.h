@@ -1,5 +1,11 @@
 #ifndef CEkran_h
 #define CEkran_h
+//#include <Adafruit_GFX.h>   
+#include <Arduino.h>
+#include <gfxfont.h>
+
+#include <Fonts/FreeSans9pt7b.h>
+#include <Fonts/FreeSansBold12pt7b.h>
 #include <ArduinoJson.h>
 #include "CButtonWnd.h"
 #include "CWiatrak.h"
@@ -31,7 +37,7 @@ class CEkran
 	///////////////////////
 
 	uint8_t _ekranID;
-	
+	unsigned long loop_ms=0;
 	rozkazJson _rozkazCallBack;
 	public:
   CLcd *_lcd;
@@ -63,6 +69,7 @@ class CEkran
 class CEkranInfo: public CEkran
 {
 	CWentGUI *_wentGUI;
+ 
 	public:
 	CEkranInfo(CLcd *lcd,uint8_t _ekranID,rozkazJson rozkazCallBack):CEkran(lcd,_ekranID,rozkazCallBack){};
 	virtual void Rysuj(CWiatrak wiatraki[], CKomora komory[]);

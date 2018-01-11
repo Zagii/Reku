@@ -17,7 +17,7 @@ CEkran::CEkran(CLcd *lcd,uint8_t ekranID,rozkazJson rozkazCallBack)
 		menuDolBtn[i]=new CButtonWnd(_lcd,i,i*45+4+i*25,190,45,45,(char*)plikiBMP_B[i],(char*)plikiBMP_Z[i]);
 		
 	}
-  ZmienStanMenuDol(_ekranID);
+ // ZmienStanMenuDol(_ekranID);
   Serial.println("koniec konstruktora CEkran");
 };
 void CEkran::ZmienStanMenuDol(uint8_t naEkran)
@@ -34,6 +34,7 @@ void CEkran::ZmienStanMenuDol(uint8_t naEkran)
 void CEkran::RysujZTlem(CWiatrak wiatraki[], CKomora komory[])
 {
 	_lcd->clrScr();
+ ZmienStanMenuDol(_ekranID);
 	Rysuj( wiatraki, komory);
 }
 
@@ -61,6 +62,63 @@ void CEkran::RysujMenuDol()
 void CEkranInfo::loop(CWiatrak Wiatraki[], CKomora Komory[])
 {
   _wentGUI->RysujLuk(Wiatraki[0].dajZadanaPredkoscProcent(),Wiatraki[1].dajZadanaPredkoscProcent());
+
+    if(loop_ms-millis()>500)
+    {
+      Serial.println("x");
+    /* sprawnosc reku n=(T2-T1)/(T3-T1)
+     * 
+     * ηT – sprawność temperaturowa rekuperatora (tutaj jako liczba bezwymiarowa z zakresu <0,1), producenci często podają sprawność w procentach
+    T1 – temperatura powietrza nawiewanego przed wymiennikiem [°C]
+    T2 – temperatura powietrza nawiewanego za wymiennikiem [°C]
+    T3 – temperatura powietrza wywiewanego przed wymiennikiem [°C]
+    */
+    double n=(Komory[KOMORA_NAWIEW].dajTemp() - Komory[KOMORA_CZERPNIA].dajTemp())/(Komory[KOMORA_WYWIEW].dajTemp() - Komory[KOMORA_CZERPNIA].dajTemp());
+    
+     _lcd->setFont(&FreeSansBold12pt7b);
+     // _lcd->setFont(BigFont);
+  _lcd->setColor(255,255,255);
+     //temp nawiew
+    // _lcd->print(Komory[KOMORA_NAWIEW].dajTemp(),50,100 );
+     _lcd->print("17.2 C",20,80 );
+      //temp wywiew
+     // _lcd->print(Komory[KOMORA_WYWIEW].dajTemp(),50,120 );
+      _lcd->setFont(&FreeSans9pt7b);
+     //temp czerpnia
+  //    _lcd->print(Komory[KOMORA_CZERPNIA].dajTemp(),100,100 );
+      _lcd->print("-10.1 C",110,40 );
+ 
+      _lcd->print("21.3 C",30,150 );
+      //wilg w domu
+   //   _lcd->showBMP(
+      //_lcd->print(Komory[KOMORA_WYWIEW].dajWilgotnosc(),100,80 );
+       _lcd->print("xx %",40,110 );
+          
+      _lcd->setFont();
+           //temp wyrzutnia
+     // _lcd->print(Komory[KOMORA_WYRZUTNIA].dajTemp(),100,120 );
+      _lcd->print("11.4 C",130,160 );
+      /////////////////////////////////////
+      ////// odswiezanie menu gora //////////
+      /////////////////////////////////////
+
+      //ikonka jesli polaczone
+      //ikonka jesli rozmrazanie
+      //ikonka jesli nagrzewnica
+      //ikonka jesli wymienic filtr
+      // predkosc wiatraka nawiew
+      _lcd->print("N=2123 rpm", 100,5);
+      // predkosc wiatraka wywiew
+      _lcd->print("W=3123 rpm", 170,5);
+      // sprawnosc
+      _lcd->print("n=", 235,5);
+      n=73.456;
+     _lcd->printNumF(n,1,250,5);
+     _lcd->print("%", 275,5);
+     //czas
+     _lcd->print("21:32",290,5);
+    loop_ms=millis();
+    }
   }
  void CEkranInfo::Rysuj(CWiatrak wiatraki[], CKomora komory[])
 {
@@ -123,7 +181,7 @@ void CEkranInfo::loop(CWiatrak Wiatraki[], CKomora Komory[])
   }
   if(but>=0)
   {
-   // ZmienStanMenuDol(but);
+    //ZmienStanMenuDol(but);
     _lcd->zmienEkran(but);
   }
 	//czy trzeba przerysowac ekran?
@@ -166,7 +224,7 @@ void CEkranDashboard::loop(CWiatrak Wiatraki[], CKomora Komory[])
   }
   if(but>=0)
   {
-    ZmienStanMenuDol(but);
+   // ZmienStanMenuDol(but);
     _lcd->zmienEkran(but);
   }
 	//czy trzeba przerysowac ekran?
@@ -266,7 +324,7 @@ return false;
   }
   if(but>=0)
   {
-    ZmienStanMenuDol(but);
+   // ZmienStanMenuDol(but);
     _lcd->zmienEkran(but);
   }
 	//czy trzeba przerysowac ekran?
