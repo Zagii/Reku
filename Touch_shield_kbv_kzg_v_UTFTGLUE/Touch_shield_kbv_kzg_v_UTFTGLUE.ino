@@ -16,7 +16,7 @@
 #include <SdFat.h>           // Use the SdFat library
 #include <MCUFRIEND_kbv.h>
 #include <ArduinoJson.h>
-
+#include <EasyTransfer.h>
 
 #if !defined(BigFont)
 extern uint8_t BigFont[];    //.kbv GLUE defines as GFXFont ref
@@ -31,6 +31,7 @@ char rozkazStr[JSON_DL_ROZKAZU];
 #include "CKomora.h"
 //#include "CWentGUI.h"
 
+
 #define WIATRAK_IN 0
 #define WIATRAK_OUT 1
 #define PIN_WIATRAK_CZERPNIA 46
@@ -39,7 +40,21 @@ char rozkazStr[JSON_DL_ROZKAZU];
 #define PIN_TACHO_WIATRAK_WYWIEW 20
 
 
+#define MAX_TOPIC_LENGHT 30
+#define MAX_MSG_LENGHT 50
 
+struct RS_DATA_STRUCTURE
+{
+  uint8_t type; //RS_xx
+  String topic;
+  String msg;
+};
+
+//give a name to the group of data
+RS_DATA_STRUCTURE rxdata;
+RS_DATA_STRUCTURE txdata;
+//create two objects
+EasyTransfer ETin, ETout; 
 
 char* zrobJson(uint8_t paramName, uint16_t paramValue);
 
@@ -58,7 +73,9 @@ void setup(void)
    Serial.begin(115200);
    lcd.begin();
   
-   
+   ETin.begin(details(rxdata), &Serial);
+   ETout.begin(details(txdata), &Serial);
+  
    for(uint8_t i=0;i<KOMORA_SZT;i++)
    {
 	   komory[i]=CKomora();
@@ -184,7 +201,31 @@ void realizujRozkaz(uint16_t paramName,uint16_t paramValue)
 	}
 	
 }
+void readRS()
+{
+    if(!ETin.receiveData()) return;
 
+    switch(rxdata.type)
+    {
+      case RS_CONN_INFO:   // wifi / mqtt status
+      Serial.println("CONNinfoNode: topic="+rxdata.topic+", msg="+rxdata.msg);
+           break;
+      case RS_RECEIVE_MQTT:  // msg from mqtt serwer
+      Serial.println("MQTTmsg: topic="+rxdata.topic+", msg="+rxdata.msg);
+           break;
+      case RS_PUBLISH_MQTT:  // msg to send
+           //nie pojawi sie
+           break;
+      case RS_SUBSCRIBE_MQTT:  //setup subsribe topic
+           //nie pojawi sie
+           break;
+      case RS_SETUP_INFO:  //
+           break;
+      case RS_DEBUG_INFO:  //debug info
+          Serial.println("DEBUGnode: topic="+rxdata.topic+", msg="+rxdata.msg);
+           break;
+      }
+}
 void loop()
 {
 	for(uint8_t i=0;i<KOMORA_SZT;i++)
@@ -205,6 +246,7 @@ void loop()
 		*/
 	}
 	/// odczytaj rozkaz z Seriala
+   ReadRS();
 	//recvWithStartEndMarkers();
     //showNewData();
 	/// przetwarzanie rozkazu
