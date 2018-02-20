@@ -65,7 +65,7 @@ void CEkranInfo::loop(CWiatrak Wiatraki[], CKomora Komory[])
 
     if(loop_ms-millis()>500)
     {
-      Serial.println("x");
+    //  Serial.println("x");
     /* sprawnosc reku n=(T2-T1)/(T3-T1)
      * 
      * ηT – sprawność temperaturowa rekuperatora (tutaj jako liczba bezwymiarowa z zakresu <0,1), producenci często podają sprawność w procentach

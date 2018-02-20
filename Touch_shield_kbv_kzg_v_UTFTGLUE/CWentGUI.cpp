@@ -92,8 +92,8 @@ if(pwmNawiew==_pozNawiew &&pwmWywiew==_pozWywiew)//&& tryb==_tryb)
      uint16_t maxRW= map(_pozWywiew, 0, 100, 0, 270);
    // maxRN=120;///tylko do debuga
    // maxRW=80;
-    Serial.print("RN=");Serial.print(maxRN);
-    Serial.print("RW=");Serial.println(maxRW);
+ //   Serial.print("RN=");Serial.print(maxRN);
+   // Serial.print("RW=");Serial.println(maxRW);
      ///ramka
       _lcd->setColor(70,70,70);
     
@@ -116,14 +116,14 @@ if(pwmNawiew==_pozNawiew &&pwmWywiew==_pozWywiew)//&& tryb==_tryb)
   {
     _lcd->setColor(90,90,255);
     _lcd->drawArc(_x+_cx,_y+_cy,_r,tmp,maxRN,_gr);
-     Serial.print("tmp");Serial.print(tmp);
-    Serial.print("RN");Serial.println(maxRN);
+  //   Serial.print("tmp");Serial.print(tmp);
+   // Serial.print("RN");Serial.println(maxRN);
   }else //jeśli nie to czerwony
   {
      _lcd->setColor(255,90,90); 
      _lcd->drawArc(_x+_cx,_y+_cy,_r,tmp,maxRW,_gr);
-     Serial.print("tmp");Serial.print(tmp);
-    Serial.print("RW");Serial.println(maxRW);
+  //   Serial.print("tmp");Serial.print(tmp);
+ //   Serial.print("RW");Serial.println(maxRW);
   }
 
   ///// koniec pomysłu :)

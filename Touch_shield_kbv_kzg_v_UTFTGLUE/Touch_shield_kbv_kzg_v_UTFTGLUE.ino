@@ -43,6 +43,14 @@ char rozkazStr[JSON_DL_ROZKAZU];
 #define MAX_TOPIC_LENGHT 30
 #define MAX_MSG_LENGHT 50
 
+
+#define RS_CONN_INFO 0  // wifi / mqtt status
+#define RS_RECEIVE_MQTT 1 // msg from mqtt serwer
+#define RS_PUBLISH_MQTT 2 // msg to send
+#define RS_SUBSCRIBE_MQTT 3 //setup subsribe topic
+#define RS_SETUP_INFO 4 //
+#define RS_DEBUG_INFO 5 //debug info
+
 struct RS_DATA_STRUCTURE
 {
   uint8_t type; //RS_xx
@@ -72,9 +80,9 @@ void setup(void)
 {
    Serial.begin(115200);
    lcd.begin();
-  
-   ETin.begin(details(rxdata), &Serial);
-   ETout.begin(details(txdata), &Serial);
+   Serial1.begin(115200);
+   ETin.begin(details(rxdata), &Serial1);
+   ETout.begin(details(txdata), &Serial1);
   
    for(uint8_t i=0;i<KOMORA_SZT;i++)
    {
@@ -226,6 +234,7 @@ void readRS()
            break;
       }
 }
+unsigned long mmm=0;
 void loop()
 {
 	for(uint8_t i=0;i<KOMORA_SZT;i++)
@@ -245,8 +254,24 @@ void loop()
 		ustaw rozmrozenie
 		*/
 	}
+ if(millis()-mmm>3000)
+ {
+    txdata.type=RS_PUBLISH_MQTT;
+    txdata.topic="Reku/mega";
+    txdata.msg=mmm;
+     ETout.sendData();
+     Serial1.println(mmm);
+     Serial.print(mmm);
+    mmm=millis();
+ }
+ while (Serial1.available()) {     // If anything comes in Serial1 (pins 0 & 1)
+    Serial.write(Serial1.read());   // read it and send it out Serial (USB)
+    //// pomaranczowy kabeek do tx nodemcu
+    //// połączyć puste RXI z TXO od strony 5v
+    /// RXO na czerwony kabelek po 3V
+  }
 	/// odczytaj rozkaz z Seriala
-   ReadRS();
+   readRS();
 	//recvWithStartEndMarkers();
     //showNewData();
 	/// przetwarzanie rozkazu
