@@ -260,16 +260,11 @@ void loop()
     txdata.topic="Reku/mega";
     txdata.msg=mmm;
      ETout.sendData();
-     Serial1.println(mmm);
-     Serial.print(mmm);
+  
+    
     mmm=millis();
  }
- while (Serial1.available()) {     // If anything comes in Serial1 (pins 0 & 1)
-    Serial.write(Serial1.read());   // read it and send it out Serial (USB)
-    //// pomaranczowy kabeek do tx nodemcu
-    //// połączyć puste RXI z TXO od strony 5v
-    /// RXO na czerwony kabelek po 3V
-  }
+ 
 	/// odczytaj rozkaz z Seriala
    readRS();
 	//recvWithStartEndMarkers();
