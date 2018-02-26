@@ -4,7 +4,8 @@
  * touchscreen.h -> https://github.com/adafruit/Touch-Screen-Library
  * Adafruit_GFX.h -> def arduino
  * SdFat.h -> def arduino https://github.com/greiman/SdFat trzeba tez zmienic flage na soft spi w bibliotece konfiguracji
- * 
+ * OneWire
+ * DallasTemerature
  * 
  */
 
