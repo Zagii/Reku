@@ -16,7 +16,8 @@
 #include <SdFat.h>           // Use the SdFat library
 #include <MCUFRIEND_kbv.h>
 #include <ArduinoJson.h>
-#include <EasyTransfer.h>
+//#include <EasyTransfer.h>
+#include <KZGSerial.h>
 
 #if !defined(BigFont)
 extern uint8_t BigFont[];    //.kbv GLUE defines as GFXFont ref
@@ -44,25 +45,25 @@ char rozkazStr[JSON_DL_ROZKAZU];
 #define MAX_MSG_LENGHT 50
 
 
-#define RS_CONN_INFO 0  // wifi / mqtt status
-#define RS_RECEIVE_MQTT 1 // msg from mqtt serwer
-#define RS_PUBLISH_MQTT 2 // msg to send
-#define RS_SUBSCRIBE_MQTT 3 //setup subsribe topic
-#define RS_SETUP_INFO 4 //
-#define RS_DEBUG_INFO 5 //debug info
-
+#define RS_CONN_INFO 'a'  // wifi / mqtt status
+#define RS_RECEIVE_MQTT 'b' // msg from mqtt serwer
+#define RS_PUBLISH_MQTT 'c' // msg to send
+#define RS_SUBSCRIBE_MQTT 'd' //setup subsribe topic
+#define RS_SETUP_INFO 'e' //
+#define RS_DEBUG_INFO 'f' //debug info
+/*
 struct RS_DATA_STRUCTURE
 {
   uint8_t type; //RS_xx
   String topic;
   String msg;
 };
-
+*/
 //give a name to the group of data
-RS_DATA_STRUCTURE rxdata;
-RS_DATA_STRUCTURE txdata;
+//RS_DATA_STRUCTURE rxdata;
+//RS_DATA_STRUCTURE txdata;
 //create two objects
-EasyTransfer ETin, ETout; 
+//EasyTransfer ETin, ETout; 
 
 char* zrobJson(uint8_t paramName, uint16_t paramValue);
 
@@ -75,15 +76,16 @@ CWiatrak wiatraki[WIATRAKI_SZT]=
 };
 
 
-
+KZGSerial serial;
 void setup(void)
 {
    Serial.begin(115200);
    lcd.begin();
    Serial1.begin(115200);
-   ETin.begin(details(rxdata), &Serial1);
-   ETout.begin(details(txdata), &Serial1);
-  
+ //  ETin.begin(details(rxdata), &Serial1);
+  // ETout.begin(details(txdata), &Serial1);
+  serial.begin(&Serial1);
+  serial.printRS(RS_PUBLISH_MQTT,"DebugTopic","MegaPolaczone");
    for(uint8_t i=0;i<KOMORA_SZT;i++)
    {
 	   komory[i]=CKomora();
@@ -211,9 +213,9 @@ void realizujRozkaz(uint16_t paramName,uint16_t paramValue)
 }
 void readRS()
 {
-    if(!ETin.receiveData()) return;
+//    if(!ETin.receiveData()) return;
 
-    switch(rxdata.type)
+   /* switch(rxdata.type)
     {
       case RS_CONN_INFO:   // wifi / mqtt status
       Serial.println("CONNinfoNode: topic="+rxdata.topic+", msg="+rxdata.msg);
@@ -233,8 +235,10 @@ void readRS()
           Serial.println("DEBUGnode: topic="+rxdata.topic+", msg="+rxdata.msg);
            break;
       }
+      */
 }
 unsigned long mmm=0;
+ char b[80];
 void loop()
 {
 	for(uint8_t i=0;i<KOMORA_SZT;i++)
@@ -254,19 +258,34 @@ void loop()
 		ustaw rozmrozenie
 		*/
 	}
- if(millis()-mmm>3000)
+ if(millis()-mmm>30000)
  {
-    txdata.type=RS_PUBLISH_MQTT;
-    txdata.topic="Reku/mega";
-    txdata.msg=mmm;
-     ETout.sendData();
-  
-    
     mmm=millis();
+  //  txdata.type=RS_PUBLISH_MQTT;
+   // txdata.topic="Reku/mega";
+    //txdata.msg=mmm;
+     //ETout.sendData();
+     char mst[50];
+     sprintf(mst,"Mega millis od restartu %lu ms.",mmm);
+     serial.printRS(RS_PUBLISH_MQTT,"Reku/mega",mst);
+   
+  // Serial.println(mst);
+    
+  
  }
  
 	/// odczytaj rozkaz z Seriala
-   readRS();
+  // readRS();
+  serial.loop();
+  if(serial.isMsgWaiting())
+  {
+   
+   sprintf(b,"Przyszło z nodeMCU: type =%d / %c, topic= s, msg=s",serial.getMsgType(),serial.getMsgType()); //,serial.getMsgTopic(),serial.getMsgValue());
+    Serial.println(b);
+    Serial.println(serial.getMsgTopic());
+     Serial.println(serial.getMsgValue());
+    
+  }
 	//recvWithStartEndMarkers();
     //showNewData();
 	/// przetwarzanie rozkazu
