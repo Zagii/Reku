@@ -17,6 +17,8 @@
 #include <MCUFRIEND_kbv.h>
 #include <ArduinoJson.h>
 #include <EasyTransfer.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
 #if !defined(BigFont)
 extern uint8_t BigFont[];    //.kbv GLUE defines as GFXFont ref
@@ -79,7 +81,7 @@ void setup(void)
    for(uint8_t i=0;i<KOMORA_SZT;i++)
    {
 	   komory[i]=CKomora();
-	   komory[i].begin();
+	   komory[i].begin(i);
    }
    attachInterrupt(digitalPinToInterrupt( wiatraki[WIATRAK_IN].dajISR()), isrIN, RISING );
    attachInterrupt(digitalPinToInterrupt( wiatraki[WIATRAK_OUT].dajISR()), isrOUT, RISING );
@@ -205,7 +207,7 @@ void readRS()
 {
     if(!ETin.receiveData()) return;
 
-    switch(rxdata.type)
+ /*   switch(rxdata.type)
     {
       case RS_CONN_INFO:   // wifi / mqtt status
       Serial.println("CONNinfoNode: topic="+rxdata.topic+", msg="+rxdata.msg);
@@ -224,7 +226,7 @@ void readRS()
       case RS_DEBUG_INFO:  //debug info
           Serial.println("DEBUGnode: topic="+rxdata.topic+", msg="+rxdata.msg);
            break;
-      }
+      }*/
 }
 void loop()
 {
@@ -246,7 +248,7 @@ void loop()
 		*/
 	}
 	/// odczytaj rozkaz z Seriala
-   ReadRS();
+   readRS();
 	//recvWithStartEndMarkers();
     //showNewData();
 	/// przetwarzanie rozkazu

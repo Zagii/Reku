@@ -16,4 +16,6 @@
 #define KOMORA_SZT 4
 #define WIATRAKI_SZT 2
 
+void dPrintf(const char *format, ...);
+
 #endif
