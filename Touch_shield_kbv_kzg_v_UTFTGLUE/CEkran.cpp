@@ -79,14 +79,17 @@ void CEkranInfo::loop(CWiatrak Wiatraki[], CKomora Komory[])
      // _lcd->setFont(BigFont);
   _lcd->setColor(255,255,255);
      //temp nawiew
-    // _lcd->print(Komory[KOMORA_NAWIEW].dajTemp(),50,100 );
-     _lcd->print("17.2 C",20,80 );
+     char buf[20];
+     sprintf(buf,"%4.1f C",Komory[KOMORA_NAWIEW].dajTemp());
+     _lcd->print(buf,20,80 );
+     //_lcd->print("17.2 C",20,80 );
       //temp wywiew
      // _lcd->print(Komory[KOMORA_WYWIEW].dajTemp(),50,120 );
       _lcd->setFont(&FreeSans9pt7b);
      //temp czerpnia
-  //    _lcd->print(Komory[KOMORA_CZERPNIA].dajTemp(),100,100 );
-      _lcd->print("-10.1 C",110,40 );
+      sprintf(buf,"%4.1f C",Komory[KOMORA_CZERPNIA].dajTemp());
+      _lcd->print(buf,110,40 );
+  //    _lcd->print("-10.1 C",110,40 );
  
       _lcd->print("21.3 C",30,150 );
       //wilg w domu
@@ -97,7 +100,8 @@ void CEkranInfo::loop(CWiatrak Wiatraki[], CKomora Komory[])
       _lcd->setFont();
            //temp wyrzutnia
      // _lcd->print(Komory[KOMORA_WYRZUTNIA].dajTemp(),100,120 );
-      _lcd->print("11.4 C",130,160 );
+       sprintf(buf,"%4.1f C",Komory[KOMORA_WYRZUTNIA].dajTemp());
+      _lcd->print(buf,130,160 );
       /////////////////////////////////////
       ////// odswiezanie menu gora //////////
       /////////////////////////////////////

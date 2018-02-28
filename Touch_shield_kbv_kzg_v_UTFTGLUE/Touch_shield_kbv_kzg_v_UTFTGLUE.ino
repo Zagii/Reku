@@ -7,8 +7,6 @@
  * 
  * 
  */
-
-
 #include <Arduino.h>
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <TouchScreen.h>
@@ -33,7 +31,6 @@ char rozkazStr[JSON_DL_ROZKAZU];
 #include "CKomora.h"
 //#include "CWentGUI.h"
 
-
 #define WIATRAK_IN 0
 #define WIATRAK_OUT 1
 #define PIN_WIATRAK_CZERPNIA 46
@@ -41,20 +38,19 @@ char rozkazStr[JSON_DL_ROZKAZU];
 #define PIN_WIATRAK_WYWIEW 45
 #define PIN_TACHO_WIATRAK_WYWIEW 20
 
-
-#define MAX_TOPIC_LENGHT 30
+#define MAX_TOPIC_LENGHT 50
 #define MAX_MSG_LENGHT 50
 
-struct RS_DATA_STRUCTURE
+struct SERIAL_DATA_STRUCTURE
 {
-  uint8_t type; //RS_xx
-  String topic;
-  String msg;
+  char msg[MAX_MSG_LENGHT];
+  char topic[MAX_TOPIC_LENGHT];
+  char typ;
 };
 
 //give a name to the group of data
-RS_DATA_STRUCTURE rxdata;
-RS_DATA_STRUCTURE txdata;
+SERIAL_DATA_STRUCTURE rxdata;
+SERIAL_DATA_STRUCTURE txdata;
 //create two objects
 EasyTransfer ETin, ETout; 
 
@@ -68,16 +64,40 @@ CWiatrak wiatraki[WIATRAKI_SZT]=
 	CWiatrak(PIN_WIATRAK_WYWIEW,PIN_TACHO_WIATRAK_WYWIEW)
 };
 
+#define RS_CONN_INFO 'c'  // wifi / mqtt status
+#define RS_RECEIVE_MQTT 'r' // msg from mqtt serwer
+#define RS_PUBLISH_MQTT 'p' // msg to send
+#define RS_SETUP_INFO 's' //
+#define RS_DEBUG_INFO 'd' //debug info
 
+const char* publishTopic="Reku";
+const char* debugTopic="DebugTopic/Reku/Mega2560";
+
+void sendRS(char * typ, char* topic, char* msg, char* inne="")
+{
+  dPrintf("%s:%d: %s -> wysyłam typ=%c, topic=%s, msg=%s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__,typ,topic,msg);
+  txdata.typ=typ;
+  strcpy(txdata.topic,topic);
+  strcpy(txdata.msg,msg);
+  if(strlen(inne)>0)
+  { 
+    strcat(txdata.msg,"_");
+    strcat(txdata.msg,inne);
+  }
+  ETout.sendData();
+  
+}
 
 void setup(void)
 {
    Serial.begin(115200);
+   Serial1.begin(115200);
+   ETin.begin(details(rxdata), &Serial1);
+   ETout.begin(details(txdata), &Serial1);
+
+   sendRS(RS_DEBUG_INFO,debugTopic,__PRETTY_FUNCTION__,"restart");
+   
    lcd.begin();
-  
-   ETin.begin(details(rxdata), &Serial);
-   ETout.begin(details(txdata), &Serial);
-  
    for(uint8_t i=0;i<KOMORA_SZT;i++)
    {
 	   komory[i]=CKomora();
@@ -87,7 +107,7 @@ void setup(void)
    attachInterrupt(digitalPinToInterrupt( wiatraki[WIATRAK_OUT].dajISR()), isrOUT, RISING );
    wiatraki[WIATRAK_IN].begin();
    wiatraki[WIATRAK_OUT].begin();
-   Serial.println("koniec setup glowny");
+    sendRS(RS_DEBUG_INFO,debugTopic,__PRETTY_FUNCTION__,"koniec");
 }
 void isrIN()
 {
@@ -133,50 +153,6 @@ char* zrobJson(uint8_t paramName, uint16_t paramValue)
 	return 0;
 }
 
-const byte numChars = 32;
-char receivedChars[numChars];
-
-boolean newData = false;
-void recvWithStartEndMarkers() {
-    static boolean recvInProgress = false;
-    static byte ndx = 0;
-    char startMarker = '<';
-    char endMarker = '>';
-    char rc;
-
-    while (Serial.available() > 0 && newData == false) {
-        rc = Serial.read();
-
-        if (recvInProgress == true) {
-            if (rc != endMarker) {
-                receivedChars[ndx] = rc;
-                ndx++;
-                if (ndx >= numChars) {
-                    ndx = numChars - 1;
-                }
-            }
-            else {
-                receivedChars[ndx] = '\0'; // terminate the string
-                recvInProgress = false;
-                ndx = 0;
-                newData = true;
-            }
-        }
-
-        else if (rc == startMarker) {
-            recvInProgress = true;
-        }
-    }
-}
-
-void showNewData() {
-    if (newData == true) {
-        Serial.print("This just in ... ");
-        Serial.println(receivedChars);
-        newData = false;
-    }
-}
-
 
 void realizujRozkaz(uint16_t paramName,uint16_t paramValue) 
 {
@@ -206,27 +182,23 @@ void realizujRozkaz(uint16_t paramName,uint16_t paramValue)
 void readRS()
 {
     if(!ETin.receiveData()) return;
-
- /*   switch(rxdata.type)
+    dPrintf("readRS> typ=%c, topic=%s, msg=%s\n",rxdata.typ,rxdata.topic,rxdata.msg);
+    switch(rxdata.typ)
     {
       case RS_CONN_INFO:   // wifi / mqtt status
-      Serial.println("CONNinfoNode: topic="+rxdata.topic+", msg="+rxdata.msg);
+    
            break;
       case RS_RECEIVE_MQTT:  // msg from mqtt serwer
-      Serial.println("MQTTmsg: topic="+rxdata.topic+", msg="+rxdata.msg);
+    
            break;
-      case RS_PUBLISH_MQTT:  // msg to send
-           //nie pojawi sie
-           break;
-      case RS_SUBSCRIBE_MQTT:  //setup subsribe topic
-           //nie pojawi sie
+      case RS_PUBLISH_MQTT:  // msg to send, nie pojawi sie
            break;
       case RS_SETUP_INFO:  //
            break;
       case RS_DEBUG_INFO:  //debug info
-          Serial.println("DEBUGnode: topic="+rxdata.topic+", msg="+rxdata.msg);
+          
            break;
-      }*/
+      }
 }
 void loop()
 {
@@ -249,8 +221,7 @@ void loop()
 	}
 	/// odczytaj rozkaz z Seriala
    readRS();
-	//recvWithStartEndMarkers();
-    //showNewData();
+	
 	/// przetwarzanie rozkazu
 	
 	if(ile_w_kolejce>0)
@@ -258,7 +229,7 @@ void loop()
 		for(int i=0;i<ile_w_kolejce;i++)
 		{
       Serial.print("Jest w kolejce "); Serial.print(i); Serial.print("/");Serial.print(ile_w_kolejce);Serial.print(" ");
-    Serial.print(kolejkaRozkazow[i][0]);Serial.print(", ");Serial.println(kolejkaRozkazow[i][1]);
+      Serial.print(kolejkaRozkazow[i][0]);Serial.print(", ");Serial.println(kolejkaRozkazow[i][1]);
 			realizujRozkaz(kolejkaRozkazow[i][0],kolejkaRozkazow[i][1]);
 		}
 		ile_w_kolejce=0;

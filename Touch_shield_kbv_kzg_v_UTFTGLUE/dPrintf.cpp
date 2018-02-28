@@ -1,4 +1,5 @@
-
+#include <stdio.h>
+#include <arduino.h>
 #include "Defy.h"
 
 void dPrintf(const char *format, ...)
