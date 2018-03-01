@@ -16,7 +16,7 @@ void CKomora::pomiarWilgotnosci(){}
 
 void CKomora::begin(uint8_t komoraID)
 {
-  dPrintf("%s:%d: %s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__);
+  DPRINT(__PRETTY_FUNCTION__);DPRINT(" komoraID=");DPRINTLN(komoraID);
 	id=komoraID;
   if(!czyBylTempBegin)
   {
@@ -25,7 +25,7 @@ void CKomora::begin(uint8_t komoraID)
   }
   if (!sensors.getAddress(termometrAddr[id], id))
   {
-    dPrintf("Problem z termometrem komora id=%d",id);
+     DPRINT(__PRETTY_FUNCTION__);DPRINT(" problem z termometrem id=");DPRINTLN(id);
       
   }
   sensors.setResolution(termometrAddr[id], TEMPERATURE_PRECISION);

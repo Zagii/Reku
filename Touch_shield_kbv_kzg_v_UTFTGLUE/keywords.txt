@@ -1,0 +1,28 @@
+#######################################
+# Syntax Coloring Map
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+#MD_AButton	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+DPRINT	KEYWORD2
+DPRINTLN	KEYWORD2
+
+
+######################################
+# Constants (LITERAL1)
+#######################################
+#KEY_NONE	LITERAL1
+KOMORA_CZERPNIA	LITERAL1
+KOMORA_WYRZUTNIA	LITERAL1
+KOMORA_NAWIEW	LITERAL1
+KOMORA_WYWIEW	LITERAL1
+KOMORA_ZEWN	LITERAL1
+KOMORA_SZT	LITERAL1
+WIATRAKI_SZT	LITERAL1

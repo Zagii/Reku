@@ -10,7 +10,7 @@ extern  uint16_t  mechanicZolte[];
 
 void CLcd::begin()
   {  
-    Serial.println("start cldc begin");
+   // Serial.println("start cldc begin");
     uint16_t tmp;
    name = "S6D0154";
     
@@ -41,7 +41,7 @@ void CLcd::begin()
     }
      initGUI();
     delay(300);
-    Serial.println("koniec lcd begin");
+  //  Serial.println("koniec lcd begin");
     }
 
  
@@ -100,6 +100,7 @@ void CLcd::begin()
 }
 void CLcd::show_Serial(void)
 {
+  /*
     Serial.print(F("Found "));
     Serial.print(name);
     Serial.println(F(" LCD driver"));
@@ -113,6 +114,7 @@ void CLcd::show_Serial(void)
     Serial.println(SwapXY ? "SWAPXY" : "PORTRAIT");
     Serial.println("YP=" + String(YP)  + " XM=" + String(XM));
     Serial.println("YM=" + String(YM)  + " XP=" + String(XP));
+    */
 }
 
 
@@ -131,36 +133,38 @@ ekrany[EKRAN_DEBUG]=ekranDebug;
 ekrany[EKRAN_DEBUG]->begin();
 
 //////////////////////////////////
-zmienEkran(EKRAN_INFO);
-
-	Serial.println("koniec cldc initGUI");
+//zmienEkran(EKRAN_INFO);
+ _ekran=EKRAN_INFO;  //powinno już nie migac 2x po restarcie
+ 
+	DPRINTLN("Koniec initGUI");
 } 
  
  void CLcd::zmienEkran(uint8_t e)
  {
 	 if(e>ILE_EKRANOW)
 	 {
-		 Serial.println("Blad CLcd::zmienEkran nie ma tylu ekranow.");
+		 DPRINTLN("Blad CLcd::zmienEkran nie ma tylu ekranow.");
 		 return;
 	 }
   _ekran=e;
   przerysujEkran=true;
-  Serial.println("zmiana ekranu");
+  DPRINT(__PRETTY_FUNCTION__); DPRINT(" Zmiana ekranu na: ");DPRINTLN(_ekran);
  }
  
   uint16_t CLcd::loop(CWiatrak Wiatraki[], CKomora Komory[])
   {
     ekrany[_ekran]->loop(Wiatraki,Komory);
-	if(przerysujEkran)
-		 { 
+  	if(przerysujEkran)
+		{ 
+      DPRINTLN("Czyszczenie tla");
 		  ekrany[_ekran]->RysujZTlem(Wiatraki,Komory);
       przerysujEkran=false;
-		 }
-	if(touch()==1)// byl touch
-	{
-		return ekrany[_ekran]->Touch(xpos,ypos);
-				
-	}
+		}
+  	if(touch()==1)// byl touch
+  	{
+  		return ekrany[_ekran]->Touch(xpos,ypos); 				
+  	}
+   return 0;
   }
 
 

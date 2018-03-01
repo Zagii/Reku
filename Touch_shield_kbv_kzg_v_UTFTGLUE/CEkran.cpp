@@ -58,11 +58,13 @@ void CEkran::RysujMenuDol()
 
 
 
-//////////////////////////ekran info
+//////////////////////////ekran info 
 void CEkranInfo::loop(CWiatrak Wiatraki[], CKomora Komory[])
 {
+  //odswiezenie łuku na kółku
   _wentGUI->RysujLuk(Wiatraki[0].dajZadanaPredkoscProcent(),Wiatraki[1].dajZadanaPredkoscProcent());
 
+  //odswiezenie gornego paska
     if(loop_ms-millis()>500)
     {
       Serial.println("x");

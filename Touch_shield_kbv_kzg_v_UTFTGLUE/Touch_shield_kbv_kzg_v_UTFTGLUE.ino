@@ -4,10 +4,13 @@
  * touchscreen.h -> https://github.com/adafruit/Touch-Screen-Library
  * Adafruit_GFX.h -> def arduino
  * SdFat.h -> def arduino https://github.com/greiman/SdFat trzeba tez zmienic flage na soft spi w bibliotece konfiguracji
- * 
+ * OneWire
+ * DallasTemperature
+
  * 
  */
 #include <Arduino.h>
+
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <TouchScreen.h>
 #include <SPI.h>          // f.k. for Arduino-1.5.2
@@ -39,7 +42,7 @@ char rozkazStr[JSON_DL_ROZKAZU];
 #define PIN_TACHO_WIATRAK_WYWIEW 20
 
 #define MAX_TOPIC_LENGHT 50
-#define MAX_MSG_LENGHT 50
+#define MAX_MSG_LENGHT 20
 
 struct SERIAL_DATA_STRUCTURE
 {
@@ -73,9 +76,16 @@ CWiatrak wiatraki[WIATRAKI_SZT]=
 const char* publishTopic="Reku";
 const char* debugTopic="DebugTopic/Reku/Mega2560";
 
+/*******************************
+ * *********  sendRS ***********
+ ******************************/
+
 void sendRS(char * typ, char* topic, char* msg, char* inne="")
 {
-  dPrintf("%s:%d: %s -> wysyłam typ=%c, topic=%s, msg=%s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__,typ,topic,msg);
+  //dPrintf("%s:%d: %s -> wysyłam typ=%c, topic=%s, msg=%s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__,typ,topic,msg);
+
+  DPRINT(__PRETTY_FUNCTION__);DPRINT(" typ=");DPRINT(typ);DPRINT(", topic=");DPRINT(topic);DPRINT(", msg=");DPRINT(msg);DPRINT(", inne=");DPRINTLN(inne);
+ 
   txdata.typ=typ;
   strcpy(txdata.topic,topic);
   strcpy(txdata.msg,msg);
@@ -87,6 +97,10 @@ void sendRS(char * typ, char* topic, char* msg, char* inne="")
   ETout.sendData();
   
 }
+
+/******************************
+ * *********  Setup ***********
+ ******************************/
 
 void setup(void)
 {
@@ -107,7 +121,7 @@ void setup(void)
    attachInterrupt(digitalPinToInterrupt( wiatraki[WIATRAK_OUT].dajISR()), isrOUT, RISING );
    wiatraki[WIATRAK_IN].begin();
    wiatraki[WIATRAK_OUT].begin();
-    sendRS(RS_DEBUG_INFO,debugTopic,__PRETTY_FUNCTION__,"koniec");
+   sendRS(RS_DEBUG_INFO,debugTopic,__PRETTY_FUNCTION__,"koniec");
 }
 void isrIN()
 {
@@ -121,6 +135,7 @@ void isrOUT()
 
 char* zrobJson2(uint8_t paramName, uint16_t paramValue) 
 {
+  /*
 	StaticJsonBuffer<JSON_DL_ROZKAZU> jsonBuffer;
 	JsonArray& rT = jsonBuffer.parseArray(rozkazStr);
 	JsonArray& r = jsonBuffer.createArray();
@@ -130,7 +145,8 @@ char* zrobJson2(uint8_t paramName, uint16_t paramValue)
 	rT.printTo((char*)rozkazStr, rT.measureLength() + 1);
   
 
-  return rozkazStr;
+  return rozkazStr;*/
+  return "";
 }
 
 #define MAX_ROZKAZOW 10
@@ -138,8 +154,8 @@ uint8_t ile_w_kolejce=0;
 uint16_t kolejkaRozkazow[MAX_ROZKAZOW][2];
 void dodajDoKolejki(uint16_t paramName,uint16_t paramValue)
 {
-  Serial.print("Dodaj do kolejki");
-  Serial.print(paramName);Serial.print(", ");Serial.println(paramValue);
+  DPRINT("Dodaj do kolejki"); DPRINT(paramName);DPRINT(", ");DPRINTLN(paramValue);
+  
 	if(ile_w_kolejce>=MAX_ROZKAZOW) return;
 	kolejkaRozkazow[ile_w_kolejce][0]=paramName;
 	kolejkaRozkazow[ile_w_kolejce][1]=paramValue;
@@ -180,16 +196,39 @@ void realizujRozkaz(uint16_t paramName,uint16_t paramValue)
 	
 }
 void readRS()
-{
+{ 
     if(!ETin.receiveData()) return;
-    dPrintf("readRS> typ=%c, topic=%s, msg=%s\n",rxdata.typ,rxdata.topic,rxdata.msg);
+   
+    DPRINT(__PRETTY_FUNCTION__);DPRINT(" typ=");DPRINT(rxdata.typ);DPRINT(", topic=");DPRINT(rxdata.topic);DPRINT(", msg=");DPRINTLN(rxdata.msg);
+   
     switch(rxdata.typ)
     {
       case RS_CONN_INFO:   // wifi / mqtt status
     
            break;
       case RS_RECEIVE_MQTT:  // msg from mqtt serwer
-    
+           if(strstr(rxdata.topic,"WiatrakN")>0)
+           {
+              if(isIntChars(rxdata.msg))
+              {
+                dodajDoKolejki(JSON_PWM_NAWIEW,atoi(rxdata.msg));
+                
+              }else
+              {
+                DPRINT("ERR msg WiatrakN nie int, linia:");DPRINTLN(__LINE__);
+              }
+           }else
+           if(strstr(rxdata.topic,"WiatrakW")>0)
+           {
+               if(isIntChars(rxdata.msg))
+              {
+                dodajDoKolejki(JSON_PWM_WYWIEW,atoi(rxdata.msg));
+                
+              }else
+              {
+                DPRINT("ERR msg WiatrakW nie int, linia:");DPRINTLN(__LINE__);
+              }
+           }
            break;
       case RS_PUBLISH_MQTT:  // msg to send, nie pojawi sie
            break;
@@ -200,14 +239,19 @@ void readRS()
            break;
       }
 }
+
+/******************************
+ * ********* loop *************
+ ******************************/
+ 
 void loop()
 {
 	for(uint8_t i=0;i<KOMORA_SZT;i++)
-    {
+  {
 		komory[i].loop();
-    }
+  }
 	wiatraki[WIATRAK_IN].loop();
-    wiatraki[WIATRAK_OUT].loop();
+  wiatraki[WIATRAK_OUT].loop();
 	if(lcd.loop( wiatraki, komory)!=0)
 	{
 		//parsowanie rozkazu zapisanego juz w rozkazStr
@@ -228,8 +272,8 @@ void loop()
 	{
 		for(int i=0;i<ile_w_kolejce;i++)
 		{
-      Serial.print("Jest w kolejce "); Serial.print(i); Serial.print("/");Serial.print(ile_w_kolejce);Serial.print(" ");
-      Serial.print(kolejkaRozkazow[i][0]);Serial.print(", ");Serial.println(kolejkaRozkazow[i][1]);
+      DPRINT("Jest w kolejce ");  DPRINT(i);  DPRINT("/"); DPRINT(ile_w_kolejce); DPRINT(" ");
+      DPRINT(kolejkaRozkazow[i][0]); DPRINT(", "); DPRINTLN(kolejkaRozkazow[i][1]);
 			realizujRozkaz(kolejkaRozkazow[i][0],kolejkaRozkazow[i][1]);
 		}
 		ile_w_kolejce=0;
