@@ -1,3 +1,10 @@
+/***TODO
+ * mqttpublish parametrów
+ * godzina
+ * pasek gora
+ * sprzatanie po restarcie
+ */
+
 /**
  * potrzebne biblioteki: 
  * MCUFRIEND_kbv.h ->https://github.com/prenticedavid/MCUFRIEND_kbv 
@@ -251,7 +258,7 @@ void loop()
 		komory[i].loop();
   }
 	wiatraki[WIATRAK_IN].loop();
-
+  wiatraki[WIATRAK_OUT].loop();
 	if(lcd.loop( wiatraki, komory)!=0)
 	{
 		//parsowanie rozkazu zapisanego juz w rozkazStr

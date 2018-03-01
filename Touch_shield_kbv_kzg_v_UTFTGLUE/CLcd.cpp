@@ -1,11 +1,6 @@
 #include "CLcd.h"
 
-/***TODO
- * mqttpublish parametrów
- * godzina
- * pasek gora
- * sprzatanie po restarcie
- */
+
 
  
  SdFatSoftSpi<12, 11, 13> SD; //Bit-Bang SD_SPI_CONFIGURATION==3
