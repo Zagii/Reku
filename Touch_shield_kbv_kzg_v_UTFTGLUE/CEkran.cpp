@@ -6,8 +6,8 @@
 
 CEkran::CEkran(CLcd *lcd,uint8_t ekranID,rozkazJson rozkazCallBack)
 {
-  Serial.print("start konstruktor CEkran " );
-  Serial.println(ekranID);
+  DPRINT("start konstruktor CEkran " );
+  DPRINTLN(ekranID);
 	_lcd=lcd;
 	_ekranID=ekranID;
 	_rozkazCallBack=rozkazCallBack;
@@ -18,7 +18,7 @@ CEkran::CEkran(CLcd *lcd,uint8_t ekranID,rozkazJson rozkazCallBack)
 		
 	}
  // ZmienStanMenuDol(_ekranID);
-  Serial.println("koniec konstruktora CEkran");
+ DPRINTLN("koniec konstruktora CEkran");
 };
 void CEkran::ZmienStanMenuDol(uint8_t naEkran)
 {
@@ -67,7 +67,7 @@ void CEkranInfo::loop(CWiatrak Wiatraki[], CKomora Komory[])
   //odswiezenie gornego paska
     if(loop_ms-millis()>500)
     {
-      Serial.println("x");
+    //  Serial.println("x");
     /* sprawnosc reku n=(T2-T1)/(T3-T1)
      * 
      * ηT – sprawność temperaturowa rekuperatora (tutaj jako liczba bezwymiarowa z zakresu <0,1), producenci często podają sprawność w procentach

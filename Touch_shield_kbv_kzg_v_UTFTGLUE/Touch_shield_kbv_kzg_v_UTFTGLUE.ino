@@ -5,8 +5,7 @@
  * Adafruit_GFX.h -> def arduino
  * SdFat.h -> def arduino https://github.com/greiman/SdFat trzeba tez zmienic flage na soft spi w bibliotece konfiguracji
  * OneWire
- * DallasTemperature
-
+ * DallasTemerature
  * 
  */
 #include <Arduino.h>
@@ -17,9 +16,9 @@
 #include <SdFat.h>           // Use the SdFat library
 #include <MCUFRIEND_kbv.h>
 #include <ArduinoJson.h>
-#include <EasyTransfer.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <EasyTransfer.h>
 
 #if !defined(BigFont)
 extern uint8_t BigFont[];    //.kbv GLUE defines as GFXFont ref
@@ -44,7 +43,7 @@ char rozkazStr[JSON_DL_ROZKAZU];
 #define MAX_TOPIC_LENGHT 50
 #define MAX_MSG_LENGHT 20
 
-struct SERIAL_DATA_STRUCTURE
+struct RS_DATA_STRUCTURE
 {
   char msg[MAX_MSG_LENGHT];
   char topic[MAX_TOPIC_LENGHT];
@@ -52,10 +51,9 @@ struct SERIAL_DATA_STRUCTURE
 };
 
 //give a name to the group of data
-SERIAL_DATA_STRUCTURE rxdata;
-SERIAL_DATA_STRUCTURE txdata;
 //create two objects
-EasyTransfer ETin, ETout; 
+RS_DATA_STRUCTURE txdata,rxdata;
+EasyTransfer ETin,ETout;
 
 char* zrobJson(uint8_t paramName, uint16_t paramValue);
 
@@ -82,9 +80,9 @@ const char* debugTopic="DebugTopic/Reku/Mega2560";
 
 void sendRS(char * typ, char* topic, char* msg, char* inne="")
 {
-  //dPrintf("%s:%d: %s -> wysyłam typ=%c, topic=%s, msg=%s\n", __FILE__, __LINE__, __PRETTY_FUNCTION__,typ,topic,msg);
+  //dPrintf("%s:%d: %s -> wysyłam typ=%c, topic=%s, msg=%s\n", __FILE__, __LINE__, __func__,typ,topic,msg);
 
-  DPRINT(__PRETTY_FUNCTION__);DPRINT(" typ=");DPRINT(typ);DPRINT(", topic=");DPRINT(topic);DPRINT(", msg=");DPRINT(msg);DPRINT(", inne=");DPRINTLN(inne);
+  DPRINT(__func__);DPRINT(" typ=");DPRINT(typ);DPRINT(", topic=");DPRINT(topic);DPRINT(", msg=");DPRINT(msg);DPRINT(", inne=");DPRINTLN(inne);
  
   txdata.typ=typ;
   strcpy(txdata.topic,topic);
@@ -109,7 +107,7 @@ void setup(void)
    ETin.begin(details(rxdata), &Serial1);
    ETout.begin(details(txdata), &Serial1);
 
-   sendRS(RS_DEBUG_INFO,debugTopic,__PRETTY_FUNCTION__,"restart");
+   sendRS(RS_DEBUG_INFO,debugTopic,__func__,"restart");
    
    lcd.begin();
    for(uint8_t i=0;i<KOMORA_SZT;i++)
@@ -121,7 +119,7 @@ void setup(void)
    attachInterrupt(digitalPinToInterrupt( wiatraki[WIATRAK_OUT].dajISR()), isrOUT, RISING );
    wiatraki[WIATRAK_IN].begin();
    wiatraki[WIATRAK_OUT].begin();
-   sendRS(RS_DEBUG_INFO,debugTopic,__PRETTY_FUNCTION__,"koniec");
+   sendRS(RS_DEBUG_INFO,debugTopic,__func__,"koniec");
 }
 void isrIN()
 {
@@ -197,9 +195,10 @@ void realizujRozkaz(uint16_t paramName,uint16_t paramValue)
 }
 void readRS()
 { 
+  
     if(!ETin.receiveData()) return;
    
-    DPRINT(__PRETTY_FUNCTION__);DPRINT(" typ=");DPRINT(rxdata.typ);DPRINT(", topic=");DPRINT(rxdata.topic);DPRINT(", msg=");DPRINTLN(rxdata.msg);
+    DPRINT(__func__);DPRINT(" typ=");DPRINT(rxdata.typ);DPRINT(", topic=");DPRINT(rxdata.topic);DPRINT(", msg=");DPRINTLN(rxdata.msg);
    
     switch(rxdata.typ)
     {
@@ -238,6 +237,7 @@ void readRS()
           
            break;
       }
+     
 }
 
 /******************************
@@ -251,7 +251,7 @@ void loop()
 		komory[i].loop();
   }
 	wiatraki[WIATRAK_IN].loop();
-  wiatraki[WIATRAK_OUT].loop();
+
 	if(lcd.loop( wiatraki, komory)!=0)
 	{
 		//parsowanie rozkazu zapisanego juz w rozkazStr
@@ -264,7 +264,7 @@ void loop()
 		*/
 	}
 	/// odczytaj rozkaz z Seriala
-   readRS();
+  readRS();
 	
 	/// przetwarzanie rozkazu
 	

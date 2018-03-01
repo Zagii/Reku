@@ -1,4 +1,12 @@
 #include "CLcd.h"
+
+/***TODO
+ * mqttpublish parametrów
+ * godzina
+ * pasek gora
+ * sprzatanie po restarcie
+ */
+
  
  SdFatSoftSpi<12, 11, 13> SD; //Bit-Bang SD_SPI_CONFIGURATION==3
 extern  uint16_t  dashboardZolte[];
@@ -148,18 +156,19 @@ ekrany[EKRAN_DEBUG]->begin();
 	 }
   _ekran=e;
   przerysujEkran=true;
-  DPRINT(__PRETTY_FUNCTION__); DPRINT(" Zmiana ekranu na: ");DPRINTLN(_ekran);
+  DPRINT(__func__); DPRINT(" Zmiana ekranu na: ");DPRINTLN(_ekran);
  }
  
   uint16_t CLcd::loop(CWiatrak Wiatraki[], CKomora Komory[])
   {
-    ekrany[_ekran]->loop(Wiatraki,Komory);
+    
   	if(przerysujEkran)
 		{ 
       DPRINTLN("Czyszczenie tla");
 		  ekrany[_ekran]->RysujZTlem(Wiatraki,Komory);
       przerysujEkran=false;
 		}
+    ekrany[_ekran]->loop(Wiatraki,Komory);
   	if(touch()==1)// byl touch
   	{
   		return ekrany[_ekran]->Touch(xpos,ypos); 				
