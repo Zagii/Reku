@@ -65,7 +65,7 @@ void CEkranInfo::loop(CWiatrak Wiatraki[], CKomora Komory[])
   _wentGUI->RysujLuk(Wiatraki[0].dajZadanaPredkoscProcent(),Wiatraki[1].dajZadanaPredkoscProcent());
 
   //odswiezenie gornego paska
-    if(loop_ms-millis()>500)
+    if(millis()-loop_ms>500)
     {
     //  Serial.println("x");
     /* sprawnosc reku n=(T2-T1)/(T3-T1)

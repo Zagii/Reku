@@ -85,7 +85,7 @@ const char* debugTopic="DebugTopic/Reku/Mega2560";
  * *********  sendRS ***********
  ******************************/
 
-void sendRS(char * typ, char* topic, char* msg, char* inne="")
+void sendRS(char  typ, char* topic, char* msg, char* inne="")
 {
   //dPrintf("%s:%d: %s -> wysyłam typ=%c, topic=%s, msg=%s\n", __FILE__, __LINE__, __func__,typ,topic,msg);
 
@@ -111,6 +111,7 @@ void setup(void)
 {
    Serial.begin(115200);
    Serial1.begin(115200);
+//    Serial1.begin(9600);
    ETin.begin(details(rxdata), &Serial1);
    ETout.begin(details(txdata), &Serial1);
 
@@ -272,7 +273,7 @@ void loop()
 	}
 	/// odczytaj rozkaz z Seriala
   readRS();
-	
+	//DPRINT(".");
 	/// przetwarzanie rozkazu
 	
 	if(ile_w_kolejce>0)
