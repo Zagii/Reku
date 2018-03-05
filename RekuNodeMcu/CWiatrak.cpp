@@ -3,11 +3,8 @@
 
 void CWiatrak::begin()
 {   
-
 	pinMode(_pin_pwm, OUTPUT);
 	analogWrite(_pin_pwm,0);
-
-	
 }
 
  void CWiatrak::obslugaTachoISR()

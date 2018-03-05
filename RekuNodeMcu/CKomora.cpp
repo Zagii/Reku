@@ -4,7 +4,7 @@
 
 void CKomora::pomiarTemp()
 {
-  if(millis()-_tempMillis>1000)
+  if(millis()-_tempMillis>5000)
   {
     _tempMillis=millis();
     _temp = sensors.getTempC(termometrAddr[id]);

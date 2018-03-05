@@ -1,6 +1,6 @@
 /*
  PubSubClient -mqtt
- Easy-Transfer https://github.com/madsci1016/Arduino-EasyTransfer
+
 
  piny bez ryzyka
  D1, D2, D5, D6, D7
@@ -14,61 +14,27 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
 #include <PubSubClient.h>
-#include <EasyTransfer.h>
-#include <SoftwareSerial.h>
-
-
-
-#define DEBUG   //If you comment this line, the DPRINT & DPRINTLN lines are defined as blank.
-#ifdef DEBUG    //Macros are usually in all capital letters.
-  #define DPRINT(...)    Serial.print(__VA_ARGS__)     //DPRINT is a macro, debug print
-  #define DPRINTLN(...)  Serial.println(__VA_ARGS__)   //DPRINTLN is a macro, debug print with new line
-#else
-  #define DPRINT(...)     //now defines a blank line
-  #define DPRINTLN(...)   //now defines a blank line
-#endif
-
-
-
-//create two objects
-EasyTransfer ETin, ETout; 
-
-SoftwareSerial swSer(14, 12, false, 256);
-
-
-#define RS_CONN_INFO 'a'  // wifi / mqtt status
-#define RS_RECEIVE_MQTT 'b' // msg from mqtt serwer
-#define RS_PUBLISH_MQTT 'c' // msg to send
-#define RS_SUBSCRIBE_MQTT 'd' //setup subsribe topic
-#define RS_SETUP_INFO 'e' //
-#define RS_DEBUG_INFO 'f' //debug info
-
-#define LED 2
-
-#define OFF HIGH
-#define ON LOW
-
-#define MAX_TOPIC_LENGHT 50
-#define MAX_MSG_LENGHT 20
-
-struct RS_DATA_STRUCTURE
-{
-  char msg[MAX_MSG_LENGHT];
-  char topic[MAX_TOPIC_LENGHT];
-  char typ;
-};
-
-
-//give a name to the group of data
-RS_DATA_STRUCTURE rxdata;
-RS_DATA_STRUCTURE txdata;
+#include "Defy.h"
+#include "CKomora.h"
+#include "CWiatrak.h"
 
 const char* nodeMCUid="Reku";
-const char* debugTopic="DebugTopic";
+const char* debugTopic="DebugTopic/Reku";
 const char* mqtt_server ="broker.hivemq.com"; //"m23.cloudmqtt.com";
 const char* mqtt_user="";//"aigejtoh";
 const char* mqtt_pass="";//"ZFlzjMm4T-XH";
 const uint16_t mqtt_port=1883;
+
+CKomora komory[KOMORA_SZT];
+CWiatrak wiatraki[WIATRAKI_SZT]=
+{
+  CWiatrak(PIN_WIATRAK_CZERPNIA,PIN_TACHO_WIATRAK_CZERPNIA),
+  CWiatrak(PIN_WIATRAK_WYWIEW,PIN_TACHO_WIATRAK_WYWIEW)
+};
+
+#define MAX_ROZKAZOW 10
+uint8_t ile_w_kolejce=0;
+uint16_t kolejkaRozkazow[MAX_ROZKAZOW][2];
 
 
 ESP8266WiFiMulti wifiMulti;
@@ -98,13 +64,10 @@ void callback(char* topic, byte* payload, unsigned int length)
   char* p = (char*)malloc(length);
   memcpy(p,payload,length);
   p[length]='\0';
-  rxdata.typ=RS_RECEIVE_MQTT;
-  strcpy(rxdata.topic,topic);
-  strcpy(rxdata.msg,p);
   if(strstr(topic,"watchdog"))
   {
     DPRINT("Watchdog msg=");
-    DPRINT(rxdata.msg);
+    DPRINT(p);
     DPRINT(" teraz=");
    
     if(isNumber(p))
@@ -113,22 +76,20 @@ void callback(char* topic, byte* payload, unsigned int length)
     
 
   }
-//  ETout.sendData();
+
  DPRINT("Debug: callback topic=");
- DPRINT(rxdata.topic);
+ DPRINT(topic);
  DPRINT(" msg=");
- DPRINT(rxdata.msg);
+ DPRINTLN(p);
+ parsujIdodajDoKolejki(topic,p);
   free(p);
 }
 
 
-void RSpisz(char typ,const char* topic,char* msg)
+void RSpisz(const char* topic,char* msg)
 {
-   txdata.typ=typ;
-   strcpy(txdata.topic,topic);
-   strcpy(txdata.msg,msg);
-   ETout.sendData();
-   DPRINT("Debug RSpisz typ=");  DPRINT(txdata.typ);  DPRINT(" topic=");  DPRINT(txdata.topic); DPRINT(" msg=");  DPRINTLN(txdata.msg);
+   DPRINT("Debug RSpisz, topic=");  DPRINT(topic); DPRINT(", msg=");  DPRINT(msg);
+   DPRINT(", wynik=");DPRINTLN(client.publish(topic,msg));
 }
 
 
@@ -136,22 +97,20 @@ void RSpisz(char typ,const char* topic,char* msg)
 
 bool setup_wifi() 
 { 
-  RSpisz(RS_DEBUG_INFO,debugTopic,"Restart WiFi ");
+  RSpisz(debugTopic,"Restart WiFi ");
   WiFi.mode(WIFI_STA);
   if(wifiMulti.run() == WL_CONNECTED)
   {
     IPAddress ip=WiFi.localIP();
-    char ss[30];
-    WiFi.SSID().toCharArray(ss,WiFi.SSID().length()+1);
     char b[100];
-    sprintf(b,"WiFi connected: %s ,%d.%d.%d.%d\n", ss, ip[0],ip[1],ip[2],ip[3]);
-    RSpisz(RS_DEBUG_INFO,debugTopic,b);
+    sprintf(b,"WiFi connected: %s ,%d.%d.%d.%d\n", WiFi.SSID().c_str(), ip[0],ip[1],ip[2],ip[3]);
+    RSpisz(debugTopic,b);
     
-    return false;
+    return true;
   }else
   {
-    RSpisz(RS_DEBUG_INFO,debugTopic,"Wifi Connection Error."); 
-    return true;
+    RSpisz(debugTopic,"Wifi Connection Error."); 
+    return false;
   }
 }
 
@@ -171,78 +130,52 @@ boolean reconnectMQTT()
     strcpy(s,nodeMCUid);
     strcat(s,"\/#");  
     client.subscribe(s);
-    DPRINT("reconnectMQTT, subscribe to: ");
-    DPRINTLN(s);
-    loguj((String)"reconnectMQTT, subscribe to: "+s);
+    const char *t="reconnectMQTT, subskrybcja do: ";
+    char b[MAX_TOPIC_LENGHT+strlen(t)];
+    sprintf(b,"%s%s",t,s);
+    RSpisz(debugTopic,b);
    
   }
   return client.connected();
 }
 
-
+void isrIN()
+{
+  wiatraki[WIATRAK_IN].obslugaTachoISR();
+}
+void isrOUT()
+{
+  wiatraki[WIATRAK_OUT].obslugaTachoISR();
+}
 /////////////////////////SETUP///////////////////////////
 void setup()
 {
  
   Serial.begin(115200);
-  swSer.begin(115200);
- 
-  DPRINT("");
+   
+  DPRINTLN("");
   DPRINTLN("Setup Serial");
   pinMode(LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
   digitalWrite(LED,ON);
-    delay(1500);
+  for(uint8_t i=0;i<KOMORA_SZT;i++)
+   {
+    komory[i]=CKomora();
+     komory[i].begin(i);
+     delay(1000); //po to by kazda komora mierzyla w innym momencie
+   }
+   attachInterrupt(digitalPinToInterrupt( wiatraki[WIATRAK_IN].dajISR()), isrIN, RISING );
+   attachInterrupt(digitalPinToInterrupt( wiatraki[WIATRAK_OUT].dajISR()), isrOUT, RISING );
+   wiatraki[WIATRAK_IN].begin();
+   wiatraki[WIATRAK_OUT].begin();
   wifiMulti.addAP("DOrangeFreeDom", "KZagaw01_ruter_key");
   wifiMulti.addAP("open.t-mobile.pl", "");
   wifiMulti.addAP("instalujWirusa", "blablabla123");
-  
-  ETin.begin(details(rxdata), &swSer);
-  ETout.begin(details(txdata), &swSer);
   
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
 }
 
-void loguj(char* t)
-{
-  char m[MAX_MSG_LENGHT];
-  sprintf(m,"%s_%s",nodeMCUid,t);
-  client.publish(debugTopic,m);
-}
-void loguj(String s)
-{
-  char m[MAX_MSG_LENGHT];
-  s.toCharArray(m,s.length());
-  loguj(m);
-}
 
-void readRS()
-{ 
-  
-    if(!ETin.receiveData()) return;
-   
-    DPRINT(__func__);DPRINT(" typ=");DPRINT(rxdata.typ);DPRINT(", topic=");DPRINT(rxdata.topic);DPRINT(", msg=");DPRINTLN(rxdata.msg);
-   
-    switch(rxdata.typ)
-    {
-      case RS_CONN_INFO:   // wifi / mqtt status
-    
-           break;
-      case RS_RECEIVE_MQTT:  // msg from mqtt serwer
-          
-           break;
-      case RS_PUBLISH_MQTT:  // msg to send, nie pojawi sie
-        
-            client.publish(rxdata.topic,rxdata.msg);
-           break;
-      case RS_SETUP_INFO:  //
-           break;
-      case RS_DEBUG_INFO:  //debug info
-          
-           break;
-      }
-     
-}
 
 
 // t is time in seconds = millis()/1000;
@@ -278,12 +211,12 @@ void loop()
     {
       if(setup_wifi())
       {
-        RSpisz(RS_CONN_INFO,debugTopic,"WiFi=ok");
+        RSpisz(debugTopic,"WiFi=ok");
         conStat=CONN_STAT_WIFI_OK;
       }
       else
       {
-        RSpisz(RS_CONN_INFO,debugTopic,"WiFi=Err");
+        RSpisz(debugTopic,"WiFi=Err");
       
       }
       lastWIFIReconnectAttempt = millis();
@@ -298,14 +231,17 @@ void loop()
         lastMQTTReconnectAttempt = millis();
         if (reconnectMQTT())
         {
-           RSpisz(RS_CONN_INFO,(char*)debugTopic,"MQTT=ok");
+           RSpisz(debugTopic,"MQTT=ok");
            conStat=CONN_STAT_WIFIMQTT_OK;
           lastMQTTReconnectAttempt = 0;
-          loguj((String)"Połączono ssid="+WiFi.SSID()+" ip="+WiFi.localIP()[0]+"."+WiFi.localIP()[1]+"."+WiFi.localIP()[2]+"."+WiFi.localIP()[3]+"\0");
+         char t[100];
+         //sprintf(t,"Połączono ssid=%s"+WiFi.SSID()+" ip="+WiFi.localIP()[0]+"."+WiFi.localIP()[1]+"."+WiFi.localIP()[2]+"."+WiFi.localIP()[3]+"\0");
+         sprintf(t,"Polaczono SSID=%s, IP=%d.%d.%d.%d",WiFi.SSID().c_str(),WiFi.localIP()[0],WiFi.localIP()[1],WiFi.localIP()[2],WiFi.localIP()[3]);
+         RSpisz(debugTopic,t);
         }
         else
         {
-             RSpisz(RS_CONN_INFO,debugTopic,"MQTT=Err");
+             RSpisz(debugTopic,"MQTT=Err");
              DPRINT("Err MQTTstat= ");DPRINTLN(client.state());
              DPRINT("WIFI ip= ");DPRINTLN(WiFi.localIP());
         }
@@ -315,8 +251,7 @@ void loop()
           client.loop();                
     }
   }
-    
-        readRS();
+   
      
           ///// LED status blink
           unsigned long d=millis()-sLEDmillis;
@@ -343,18 +278,49 @@ void loop()
             unsigned long mmm=millis();
    
             String str="czas od restartu= "+(String) TimeToString(mmm/1000);
-            loguj(str);
+   
             DPRINTLN(str);
             DPRINT("Watchdog czas ");
             DPRINTLN(mmm-WDmillis);
             if(mmm-WDmillis>600000)
             {
-              DPRINTLN("Watchdog restart");
-              loguj("Watchdog restart");
+             
+              RSpisz(debugTopic,"Watchdog restart");
               delay(3000);
               ESP.restart();
             }
           }
+
+          /////////////////// obsluga hardware //////////////////////
+            for(uint8_t i=0;i<KOMORA_SZT;i++)
+            {
+              komory[i].loop();
+            }
+            wiatraki[WIATRAK_IN].loop();
+            wiatraki[WIATRAK_OUT].loop();
+          ///////////////     obsługa kolejki     //////////////////////
+          
+          if(ile_w_kolejce>0)
+            {
+              
+                DPRINT("Jest w kolejce ");  DPRINT(ile_w_kolejce); DPRINT(" ");
+                DPRINT(kolejkaRozkazow[0][0]); DPRINT(", "); DPRINTLN(kolejkaRozkazow[0][1]);
+                realizujRozkaz(kolejkaRozkazow[0][0],kolejkaRozkazow[0][1]);
+              //usuniecie z kolejki pierwszego elementu
+              for(int i=0;i<ile_w_kolejce-1;i++)
+              {
+               kolejkaRozkazow[i][0]=kolejkaRozkazow[i+1][0];
+               kolejkaRozkazow[i][1]=kolejkaRozkazow[i+1][1];
+                
+              }
+              ile_w_kolejce--;
+            }
+          ///////////////////// wyznacz obroty wiatraka ////////////
+            // gdy manual to tylko sprawdz czy nie zamarza
+            // gdy auto to ???
+          /////////////////// publikuj stan do mqtt ////////////////
+            
+          ///////////////////// status LED /////////////////////////
             switch(conStat)
             {
               case CONN_STAT_NO: ///----------__------------__  <-- ten stan praktycznie nie występuje
@@ -380,4 +346,126 @@ void loop()
                if(d<300)digitalWrite(LED,ON); else digitalWrite(LED,OFF);
                     break;
               }
+}
+
+void dodajDoKolejki(uint16_t paramName,uint16_t paramValue)
+{
+  DPRINT("Dodaj do kolejki"); DPRINT(paramName);DPRINT(", ");DPRINTLN(paramValue);
+  
+  if(ile_w_kolejce>=MAX_ROZKAZOW) return;
+  kolejkaRozkazow[ile_w_kolejce][0]=paramName;
+  kolejkaRozkazow[ile_w_kolejce][1]=paramValue;
+  ile_w_kolejce++;
+}
+void parsujIdodajDoKolejki(char* topic,char * msg)
+{
+   if(strstr(topic,"WiatrakN")>0)
+   {
+     if(isIntChars(msg))
+     {
+        dodajDoKolejki(R_PWM_NAWIEW,atoi(msg));       
+     }else
+     {
+         DPRINT("ERR msg WiatrakN nie int, linia:");DPRINTLN(__LINE__);
+     }
+     return;
+    }
+    if(strstr(topic,"WiatrakW")>0)
+    {
+      if(isIntChars(msg))
+      {
+        dodajDoKolejki(R_PWM_WYWIEW,atoi(msg));
+      }else
+      {
+        DPRINT("ERR msg WiatrakW nie int, linia:");DPRINTLN(__LINE__);
+      }
+     return; 
+    }
+    if(strlen(topic)==strlen(nodeMCUid)+2)  //Reku/X
+    {
+       if(isIntChars(msg))
+      {
+        dodajDoKolejki(topic[strlen(topic)-1],atoi(msg));
+      }else
+      {
+        DPRINT("ERR msg ");DPRINT(msg);DPRINT(" nie int, linia:");DPRINTLN(__LINE__);
+      }
+      
+     return; 
+    }
+}
+void realizujRozkaz(uint16_t paramName,uint16_t paramValue) 
+{
+  switch(paramName)
+  {
+    case R_PWM_NAWIEW:
+      wiatraki[WIATRAK_IN].ustawPredkosc(paramValue);
+    break;
+    case R_PWM_WYWIEW:
+      wiatraki[WIATRAK_OUT].ustawPredkosc(paramValue);
+    break;
+    case R_ROZMRAZANIE_WIATRAKI: 
+      wiatraki[WIATRAK_IN].ustawPredkosc(15);
+      wiatraki[WIATRAK_OUT].ustawPredkosc(40);
+    break;
+    case R_ROZMRAZANIE_GGWC:
+    break;
+    case R_KOMINEK:
+      wiatraki[WIATRAK_IN].ustawPredkosc(50);
+      wiatraki[WIATRAK_OUT].ustawPredkosc(15);
+    break;
+    case R_AUTO:
+    break;    
+  }
+  
+}
+
+bool isFloatString(String tString) {
+  String tBuf;
+  bool decPt = false;
+ 
+  if(tString.charAt(0) == '+' || tString.charAt(0) == '-') tBuf = &tString[1];
+  else tBuf = tString; 
+
+  for(int x=0;x<tBuf.length();x++)
+  {
+    if(tBuf.charAt(x) == '.') {
+      if(decPt) return false;
+      else decPt = true; 
+    }   
+    else if(tBuf.charAt(x) < '0' || tBuf.charAt(x) > '9') return false;
+  }
+  return true;
+}
+
+
+bool isFloatChars(char * ctab) {
+  
+  boolean decPt = false;
+ uint8_t startInd=0;
+  if(ctab[0] == '+' || ctab[0] == '-') startInd=1;
+
+  for(uint8_t x=startInd;x<strlen(ctab);x++)
+  {
+    if(ctab[x] == '.')// ||ctab[x] == ',') 
+    {
+      if(decPt) return false;
+      else decPt = true; 
+    }   
+    else if(!isDigit(ctab[x])) return false;
+  }
+  return true;
+}
+  
+  bool isIntChars(char * ctab) {
+  
+  bool decPt = false;
+  uint8_t startInd=0;
+  if(ctab[0] == '+' || ctab[0] == '-') startInd=1;
+
+  for(uint8_t x=startInd;x<strlen(ctab);x++)
+  {
+   if(!isDigit(ctab[x])) return false;
+  }
+  return true;
 }
