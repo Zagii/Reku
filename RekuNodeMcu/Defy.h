@@ -8,12 +8,14 @@
 #define R_ROZMRAZANIE_GGWC 'G' //
 #define R_KOMINEK 'K' //
 #define R_AUTO 'A' //tryb automatycznego dobrania predkosci
+#define R_OFF 'O'
 
 #define T_AUTO 'a'
 #define T_MANUAL 'm'
 #define T_KOMINEK 'k'
 #define T_ROZMRAZANIE_WIATRAKI 'r'
 #define T_ROZMRAZANIE_GGWC 'g'
+#define T_OFF 'o'
 
 #define KOMORA_CZERPNIA 0
 #define KOMORA_WYRZUTNIA 1

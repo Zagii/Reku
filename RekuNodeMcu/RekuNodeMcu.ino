@@ -167,6 +167,7 @@ void setup()
    attachInterrupt(digitalPinToInterrupt( wiatraki[WIATRAK_OUT].dajISR()), isrOUT, RISING );
    wiatraki[WIATRAK_IN].begin();
    wiatraki[WIATRAK_OUT].begin();
+
   wifiMulti.addAP("DOrangeFreeDom", "KZagaw01_ruter_key");
   wifiMulti.addAP("open.t-mobile.pl", "");
   wifiMulti.addAP("instalujWirusa", "blablabla123");
@@ -200,6 +201,12 @@ char * TimeToString(unsigned long t)
 
 int conStat=CONN_STAT_NO;
 unsigned long sLEDmillis=0;
+
+char trybPracy=T_OFF;
+char trybPracyPop=T_OFF;
+unsigned long kominekMillis=0;
+uint8_t publicID=0;
+unsigned long publicMillis=0;
 
 void loop()
 {
@@ -235,7 +242,6 @@ void loop()
            conStat=CONN_STAT_WIFIMQTT_OK;
           lastMQTTReconnectAttempt = 0;
          char t[100];
-         //sprintf(t,"Połączono ssid=%s"+WiFi.SSID()+" ip="+WiFi.localIP()[0]+"."+WiFi.localIP()[1]+"."+WiFi.localIP()[2]+"."+WiFi.localIP()[3]+"\0");
          sprintf(t,"Polaczono SSID=%s, IP=%d.%d.%d.%d",WiFi.SSID().c_str(),WiFi.localIP()[0],WiFi.localIP()[1],WiFi.localIP()[2],WiFi.localIP()[3]);
          RSpisz(debugTopic,t);
         }
@@ -267,6 +273,7 @@ void loop()
           {
            
            sLEDmillis=millis();
+         
  //char mst[50];
   //   sprintf(mst,"nodeMCU millis od restartu %lu ms.",sLEDmillis);
     // serial.printRS(RS_DEBUG_INFO,"Z nodeMCU",mst);
@@ -317,9 +324,76 @@ void loop()
             }
           ///////////////////// wyznacz obroty wiatraka ////////////
             // gdy manual to tylko sprawdz czy nie zamarza
+            //jesli temp wyrzutni < 2C ustaw rozmrazanie
+            if((trybPracy!=T_OFF)&&(komory[KOMORA_WYRZUTNIA].dajTemp()<1.0f))
+            {
+               setTrybPracy(T_ROZMRAZANIE_WIATRAKI);
+            }
+            switch(trybPracy)
+            {
+              case T_OFF:
+                   wiatraki[WIATRAK_IN].ustawPredkosc(0);
+                   wiatraki[WIATRAK_OUT].ustawPredkosc(0);
+                 break;
+              case T_MANUAL:
+                break;
+              case T_AUTO:
+                //pora roku czy chlodzic czy ziebic
+                //temp zewn? czy z temp wewn da sie oszacować ile os
+                //liczba osob = czy pusto/domownicy/impreza
+                //pora dnia
+                  wiatraki[WIATRAK_IN].ustawPredkosc(15);
+                  wiatraki[WIATRAK_OUT].ustawPredkosc(15);
+                break;
+              case T_KOMINEK:
+              //todo czas 5min?
+                if(millis()-kominekMillis>300000)//5min
+                {
+                    setTrybPracy(trybPracyPop);
+                }
+                  wiatraki[WIATRAK_IN].ustawPredkosc(50);
+                  wiatraki[WIATRAK_OUT].ustawPredkosc(15);
+                
+                break;
+              case T_ROZMRAZANIE_WIATRAKI:
+                if(komory[KOMORA_WYRZUTNIA].dajTemp()>3.0f)
+                {
+                  setTrybPracy(T_AUTO);
+                } 
+                wiatraki[WIATRAK_IN].ustawPredkosc(15);
+                wiatraki[WIATRAK_OUT].ustawPredkosc(30);
+                break;
+              case T_ROZMRAZANIE_GGWC:
+                break;
+            
+            }
+            
             // gdy auto to ???
           /////////////////// publikuj stan do mqtt ////////////////
+           if(millis()-publicMillis>5000)
+           { 
             
+            publicMillis=millis();
+            publicID++;
+           if(publicID>KOMORA_SZT+WIATRAKI_SZT)
+           {
+            publicID=0;
+           }
+            char tmpTopic[MAX_TOPIC_LENGHT];
+            char tmpMsg[MAX_TOPIC_LENGHT];
+            
+            if(publicID<KOMORA_SZT)  //publikacja stanu komor
+            {
+              sprintf(tmpTopic,"%s/KOM%d/Term%d/%s",nodeMCUid,publicID,termometrAddr[publicID]);
+              dtostrf(komory[publicID].dajTemp(), 5, 2, tmpMsg);
+              RSpisz(tmpTopic,tmpMsg);
+            }else //publikacja wiatrakow
+            {
+              sprintf(tmpTopic,"%s/Wiatrak%d/",nodeMCUid,publicID-KOMORA_SZT);
+              sprintf(tmpMsg,"%d",wiatraki[publicID-KOMORA_SZT].dajOstPredkosc());
+              RSpisz(tmpTopic,tmpMsg);
+            }
+           }
           ///////////////////// status LED /////////////////////////
             switch(conStat)
             {
@@ -346,6 +420,23 @@ void loop()
                if(d<300)digitalWrite(LED,ON); else digitalWrite(LED,OFF);
                     break;
               }
+}
+
+void setTrybPracy(char t)
+{
+  trybPracyPop=trybPracy;
+  trybPracy=t;
+  if(trybPracy==T_KOMINEK)
+  {
+    kominekMillis=millis();
+  }
+  
+  char topic[MAX_TOPIC_LENGHT];
+  strcpy(topic,nodeMCUid);
+  strcat(topic,"/TrybPracy");
+  char msg[2];//[MAX_MSG_LENGHT];
+  msg[0]=t;msg[1]='\0';
+  RSpisz(topic,msg);
 }
 
 void dodajDoKolejki(uint16_t paramName,uint16_t paramValue)
@@ -399,23 +490,28 @@ void realizujRozkaz(uint16_t paramName,uint16_t paramValue)
   switch(paramName)
   {
     case R_PWM_NAWIEW:
+      setTrybPracy(T_MANUAL);
       wiatraki[WIATRAK_IN].ustawPredkosc(paramValue);
     break;
     case R_PWM_WYWIEW:
+      setTrybPracy(T_MANUAL);
       wiatraki[WIATRAK_OUT].ustawPredkosc(paramValue);
     break;
-    case R_ROZMRAZANIE_WIATRAKI: 
-      wiatraki[WIATRAK_IN].ustawPredkosc(15);
-      wiatraki[WIATRAK_OUT].ustawPredkosc(40);
+    case R_ROZMRAZANIE_WIATRAKI:
+      setTrybPracy(T_ROZMRAZANIE_WIATRAKI) ;
     break;
     case R_ROZMRAZANIE_GGWC:
+      setTrybPracy(T_ROZMRAZANIE_GGWC);
     break;
     case R_KOMINEK:
-      wiatraki[WIATRAK_IN].ustawPredkosc(50);
-      wiatraki[WIATRAK_OUT].ustawPredkosc(15);
+      setTrybPracy(T_KOMINEK);   
     break;
     case R_AUTO:
-    break;    
+      setTrybPracy(T_AUTO);
+    break;
+    case R_OFF:
+      setTrybPracy(T_OFF);
+    break;        
   }
   
 }
