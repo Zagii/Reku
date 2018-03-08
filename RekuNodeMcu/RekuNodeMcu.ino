@@ -19,6 +19,8 @@
 #include "CWiatrak.h"
 
 const char* nodeMCUid="Reku";
+const char* outTopic="Reku/OUT";
+const char* inTopic="Reku/IN";
 const char* debugTopic="DebugTopic/Reku";
 const char* mqtt_server ="broker.hivemq.com"; //"m23.cloudmqtt.com";
 const char* mqtt_user="";//"aigejtoh";
@@ -127,7 +129,7 @@ boolean reconnectMQTT()
   if (client.connect(nodeMCUid,mqtt_user,mqtt_pass)) 
   {
     char s[MAX_TOPIC_LENGHT];
-    strcpy(s,nodeMCUid);
+    strcpy(s,inTopic);
     strcat(s,"\/#");  
     client.subscribe(s);
     const char *t="reconnectMQTT, subskrybcja do: ";
@@ -266,7 +268,7 @@ void loop()
             char m[MAX_MSG_LENGHT];
             sprintf(m,"%ld",millis());
             char m2[MAX_TOPIC_LENGHT];
-            sprintf(m2,"%s/watchdog",nodeMCUid);
+            sprintf(m2,"%s/watchdog",inTopic);
             client.publish(m2,m);
           }
           if(d>3000)// max 3 sek
@@ -375,7 +377,7 @@ void loop()
             
             publicMillis=millis();
             publicID++;
-           if(publicID>KOMORA_SZT+WIATRAKI_SZT)
+           if(publicID>=KOMORA_SZT+WIATRAKI_SZT)
            {
             publicID=0;
            }
@@ -384,12 +386,13 @@ void loop()
             
             if(publicID<KOMORA_SZT)  //publikacja stanu komor
             {
-              sprintf(tmpTopic,"%s/KOM%d/Term%d/%s",nodeMCUid,publicID,termometrAddr[publicID]);
+              sprintf(tmpTopic,"%s/KOM%d/Term%d",outTopic,publicID,termometrAddr[publicID]);
               dtostrf(komory[publicID].dajTemp(), 5, 2, tmpMsg);
+              DPRINTLN(komory[publicID].dajTemp());
               RSpisz(tmpTopic,tmpMsg);
             }else //publikacja wiatrakow
             {
-              sprintf(tmpTopic,"%s/Wiatrak%d/",nodeMCUid,publicID-KOMORA_SZT);
+              sprintf(tmpTopic,"%s/Wiatrak%d",outTopic,publicID-KOMORA_SZT);
               sprintf(tmpMsg,"%d",wiatraki[publicID-KOMORA_SZT].dajOstPredkosc());
               RSpisz(tmpTopic,tmpMsg);
             }
@@ -432,7 +435,7 @@ void setTrybPracy(char t)
   }
   
   char topic[MAX_TOPIC_LENGHT];
-  strcpy(topic,nodeMCUid);
+  strcpy(topic,outTopic);
   strcat(topic,"/TrybPracy");
   char msg[2];//[MAX_MSG_LENGHT];
   msg[0]=t;msg[1]='\0';
@@ -472,7 +475,7 @@ void parsujIdodajDoKolejki(char* topic,char * msg)
       }
      return; 
     }
-    if(strlen(topic)==strlen(nodeMCUid)+2)  //Reku/X
+    if(strlen(topic)==strlen(inTopic)+2)  //Reku/X
     {
        if(isIntChars(msg))
       {

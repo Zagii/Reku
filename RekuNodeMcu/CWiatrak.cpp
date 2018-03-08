@@ -24,6 +24,7 @@ void CWiatrak::loop()
 
 void CWiatrak::ustawPredkosc(uint8_t procent)
 {
+  if(procent==_zadanaPredkoscProcent)return;
 	uint8_t pwm=map(procent, 0, 100, 0,255);
 	if(pwm>MAX_PWM)pwm=MAX_PWM;
 	analogWrite(_pin_pwm,pwm);

@@ -6,10 +6,9 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-#define ONE_WIRE_BUS 23
 #define TEMPERATURE_PRECISION 9
 
-static OneWire oneWire(ONE_WIRE_BUS);  //statyczne?
+static OneWire oneWire(PIN_ONEWIRE);  //statyczne?
   static DallasTemperature sensors(&oneWire); //statyczne?
   static bool czyBylTempBegin=false;
 
@@ -50,6 +49,7 @@ class CKomora
 	unsigned long _ms=0; //czas ms
 	
 	public:
+void printAddress(DeviceAddress deviceAddress);
 	void begin(uint8_t komoraID);
 	void loop();
 	double dajTemp(){return _temp;}
