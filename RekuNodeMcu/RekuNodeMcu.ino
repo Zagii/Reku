@@ -386,9 +386,9 @@ void loop()
             
             if(publicID<KOMORA_SZT)  //publikacja stanu komor
             {
-              sprintf(tmpTopic,"%s/KOM%d/Term%d",outTopic,publicID,termometrAddr[publicID]);
+              
+              sprintf(tmpTopic,"%s/KOM%d/Term%s",outTopic,publicID,komory[publicID].getTempAddress());
               dtostrf(komory[publicID].dajTemp(), 5, 2, tmpMsg);
-              DPRINTLN(komory[publicID].dajTemp());
               RSpisz(tmpTopic,tmpMsg);
             }else //publikacja wiatrakow
             {
