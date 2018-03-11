@@ -393,7 +393,7 @@ void loop()
             }else //publikacja wiatrakow
             {
               sprintf(tmpTopic,"%s/Wiatrak%d",outTopic,publicID-KOMORA_SZT);
-              sprintf(tmpMsg,"%d",wiatraki[publicID-KOMORA_SZT].dajOstPredkosc());
+              sprintf(tmpMsg,"%lu",wiatraki[publicID-KOMORA_SZT].dajOstPredkosc());
               RSpisz(tmpTopic,tmpMsg);
             }
            }
