@@ -6,6 +6,7 @@ void CWiatrak::begin()
 	pinMode(_pin_pwm, OUTPUT);
 	analogWrite(_pin_pwm,0);
   analogWriteRange(100);
+  pinMode(_pin_tacho, INPUT_PULLUP);
 }
 
  void CWiatrak::obslugaTachoISR()

@@ -165,10 +165,12 @@ void setup()
      komory[i].begin(i);
      delay(1000); //po to by kazda komora mierzyla w innym momencie
    }
-   attachInterrupt(digitalPinToInterrupt( wiatraki[WIATRAK_IN].dajISR()), isrIN, RISING );
-   attachInterrupt(digitalPinToInterrupt( wiatraki[WIATRAK_OUT].dajISR()), isrOUT, RISING );
    wiatraki[WIATRAK_IN].begin();
    wiatraki[WIATRAK_OUT].begin();
+  
+   attachInterrupt(digitalPinToInterrupt( wiatraki[WIATRAK_IN].dajISR()), isrIN, RISING );
+   attachInterrupt(digitalPinToInterrupt( wiatraki[WIATRAK_OUT].dajISR()), isrOUT, RISING );
+  
 
   wifiMulti.addAP("DOrangeFreeDom", "KZagaw01_ruter_key");
   wifiMulti.addAP("open.t-mobile.pl", "");
@@ -372,7 +374,7 @@ void loop()
             
             // gdy auto to ???
           /////////////////// publikuj stan do mqtt ////////////////
-           if(millis()-publicMillis>5000)
+           if(millis()-publicMillis>1000)
            { 
             
             publicMillis=millis();
