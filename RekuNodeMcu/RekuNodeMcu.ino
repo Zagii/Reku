@@ -27,6 +27,9 @@ const char* mqtt_user="";//"aigejtoh";
 const char* mqtt_pass="";//"ZFlzjMm4T-XH";
 const uint16_t mqtt_port=1883;
 
+
+void(* resetFunc) (void) = 0; //declare reset function @ address 0
+
 CKomora komory[KOMORA_SZT];
 CWiatrak wiatraki[WIATRAKI_SZT]=
 {
@@ -296,7 +299,9 @@ void loop()
              
               RSpisz(debugTopic,"Watchdog restart");
               delay(3000);
-              ESP.restart();
+              //ESP.restart();
+			   ESP.reset();  // hard reset
+			   resetFunc();
             }
           }
 
