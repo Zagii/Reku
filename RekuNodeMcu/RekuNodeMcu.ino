@@ -168,10 +168,12 @@ void setup()
      komory[i].begin(i);
      delay(1000); //po to by kazda komora mierzyla w innym momencie
    }
-   attachInterrupt(digitalPinToInterrupt( wiatraki[WIATRAK_IN].dajISR()), isrIN, RISING );
-   attachInterrupt(digitalPinToInterrupt( wiatraki[WIATRAK_OUT].dajISR()), isrOUT, RISING );
    wiatraki[WIATRAK_IN].begin();
    wiatraki[WIATRAK_OUT].begin();
+  
+   attachInterrupt(digitalPinToInterrupt( wiatraki[WIATRAK_IN].dajISR()), isrIN, RISING );
+   attachInterrupt(digitalPinToInterrupt( wiatraki[WIATRAK_OUT].dajISR()), isrOUT, RISING );
+  
 
   wifiMulti.addAP("DOrangeFreeDom", "KZagaw01_ruter_key");
   wifiMulti.addAP("open.t-mobile.pl", "");
@@ -377,7 +379,7 @@ void loop()
             
             // gdy auto to ???
           /////////////////// publikuj stan do mqtt ////////////////
-           if(millis()-publicMillis>5000)
+           if(millis()-publicMillis>1000)
            { 
             
             publicMillis=millis();
@@ -391,14 +393,14 @@ void loop()
             
             if(publicID<KOMORA_SZT)  //publikacja stanu komor
             {
-              sprintf(tmpTopic,"%s/KOM%d/Term%d",outTopic,publicID,termometrAddr[publicID]);
+              
+              sprintf(tmpTopic,"%s/KOM%d/Term%s",outTopic,publicID,komory[publicID].getTempAddress());
               dtostrf(komory[publicID].dajTemp(), 5, 2, tmpMsg);
-              DPRINTLN(komory[publicID].dajTemp());
               RSpisz(tmpTopic,tmpMsg);
             }else //publikacja wiatrakow
             {
               sprintf(tmpTopic,"%s/Wiatrak%d",outTopic,publicID-KOMORA_SZT);
-              sprintf(tmpMsg,"%d",wiatraki[publicID-KOMORA_SZT].dajOstPredkosc());
+              sprintf(tmpMsg,"%lu",wiatraki[publicID-KOMORA_SZT].dajOstPredkosc());
               RSpisz(tmpTopic,tmpMsg);
             }
            }
