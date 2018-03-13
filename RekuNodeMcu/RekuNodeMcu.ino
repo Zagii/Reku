@@ -298,7 +298,7 @@ void loop()
              
               RSpisz(debugTopic,"Watchdog restart");
               delay(3000);
-              ESP.restart();
+            //  ESP.restart();
             }
           }
 
