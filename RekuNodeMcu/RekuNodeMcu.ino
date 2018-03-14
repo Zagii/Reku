@@ -28,6 +28,22 @@ const char* mqtt_pass="";//"ZFlzjMm4T-XH";
 const uint16_t mqtt_port=1883;
 
 
+#define CONN_STAT_NO 0
+#define CONN_STAT_WIFI_CONNECTING 1
+#define CONN_STAT_WIFI_OK 2
+#define CONN_STAT_WIFIMQTT_CONNECTING 3
+#define CONN_STAT_WIFIMQTT_OK 4
+
+int conStat=CONN_STAT_NO;
+unsigned long sLEDmillis=0;
+
+char trybPracy=T_OFF;
+char trybPracyPop=T_OFF;
+unsigned long kominekMillis=0;
+uint8_t publicID=0;
+unsigned long publicMillis=0;
+unsigned long WDmillis=0;
+
 void(* resetFunc) (void) = 0; //declare reset function @ address 0
 
 CKomora komory[KOMORA_SZT];
@@ -63,7 +79,7 @@ bool isNumber(char * tmp)
   }
  return true; 
 }
-unsigned long WDmillis=0;
+
 void callback(char* topic, byte* payload, unsigned int length) 
 {
   char* p = (char*)malloc(length);
@@ -94,7 +110,14 @@ void callback(char* topic, byte* payload, unsigned int length)
 void RSpisz(const char* topic,char* msg)
 {
    DPRINT("Debug RSpisz, topic=");  DPRINT(topic); DPRINT(", msg=");  DPRINT(msg);
-   DPRINT(", wynik=");DPRINTLN(client.publish(topic,msg));
+   DPRINT(", wynik=");
+   if(conStat==CONN_STAT_WIFIMQTT_OK)
+   {
+	DPRINTLN(client.publish(topic,msg));
+   }else
+   {
+	   DPRINTLN("nie wysylam, brak polaczenia");
+   }
 }
 
 
@@ -200,21 +223,6 @@ char * TimeToString(unsigned long t)
  return str;
 }
 
-#define CONN_STAT_NO 0
-#define CONN_STAT_WIFI_CONNECTING 1
-#define CONN_STAT_WIFI_OK 2
-#define CONN_STAT_WIFIMQTT_CONNECTING 3
-#define CONN_STAT_WIFIMQTT_OK 4
-
-int conStat=CONN_STAT_NO;
-unsigned long sLEDmillis=0;
-
-char trybPracy=T_OFF;
-char trybPracyPop=T_OFF;
-unsigned long kominekMillis=0;
-uint8_t publicID=0;
-unsigned long publicMillis=0;
-
 void loop()
 {
 
@@ -274,7 +282,7 @@ void loop()
             sprintf(m,"%ld",millis());
             char m2[MAX_TOPIC_LENGHT];
             sprintf(m2,"%s/watchdog",inTopic);
-            client.publish(m2,m);
+            RSpisz(m2,m);
           }
           if(d>3000)// max 3 sek
           {
