@@ -7,6 +7,9 @@ void CWiatrak::begin()
 	analogWrite(_pin_pwm,0);
   analogWriteRange(100);
   pinMode(_pin_tacho, INPUT_PULLUP);
+  //attachInterrupt(digitalPinToInterrupt(_pin_tacho),(void*)obslugaTachoISR, RISING );
+  //attachInterrupt(digitalPinToInterrupt(_pin_tacho), isrIN, RISING );
+  //attachInterrupt(digitalPinToInterrupt( _pin_tacho), isrOUT, RISING );
 }
 
  void CWiatrak::obslugaTachoISR()

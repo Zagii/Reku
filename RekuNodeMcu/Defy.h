@@ -61,8 +61,6 @@
   #define DPRINTLN(...)   //now defines a blank line
 #endif
 
-bool isFloatChars(char * ctab);
-bool isFloatString(String tString);
-bool isIntChars(char * ctab) ;
+
  
 #endif
