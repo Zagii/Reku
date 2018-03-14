@@ -18,6 +18,17 @@
 #include "CKomora.h"
 #include "CWiatrak.h"
 
+
+#define CONN_STAT_NO 0
+#define CONN_STAT_WIFI_CONNECTING 1
+#define CONN_STAT_WIFI_OK 2
+#define CONN_STAT_WIFIMQTT_CONNECTING 3
+#define CONN_STAT_WIFIMQTT_OK 4
+
+
+int conStat=CONN_STAT_NO;
+unsigned long sLEDmillis=0;
+
 const char* nodeMCUid="Reku";
 const char* outTopic="Reku/OUT";
 const char* inTopic="Reku/IN";
@@ -26,6 +37,9 @@ const char* mqtt_server ="broker.hivemq.com"; //"m23.cloudmqtt.com";
 const char* mqtt_user="";//"aigejtoh";
 const char* mqtt_pass="";//"ZFlzjMm4T-XH";
 const uint16_t mqtt_port=1883;
+
+
+void(* resetFunc) (void) = 0; //declare reset function @ address 0
 
 CKomora komory[KOMORA_SZT];
 CWiatrak wiatraki[WIATRAKI_SZT]=
@@ -91,7 +105,11 @@ void callback(char* topic, byte* payload, unsigned int length)
 void RSpisz(const char* topic,char* msg)
 {
    DPRINT("Debug RSpisz, topic=");  DPRINT(topic); DPRINT(", msg=");  DPRINT(msg);
-   DPRINT(", wynik=");DPRINTLN(client.publish(topic,msg));
+    DPRINT(", wynik=");
+    if(conStat==CONN_STAT_WIFIMQTT_OK)
+   {
+    DPRINTLN(client.publish(topic,msg));
+   }else DPRINTLN("brak polaczenia");
 }
 
 
@@ -197,15 +215,6 @@ char * TimeToString(unsigned long t)
  return str;
 }
 
-#define CONN_STAT_NO 0
-#define CONN_STAT_WIFI_CONNECTING 1
-#define CONN_STAT_WIFI_OK 2
-#define CONN_STAT_WIFIMQTT_CONNECTING 3
-#define CONN_STAT_WIFIMQTT_OK 4
-
-int conStat=CONN_STAT_NO;
-unsigned long sLEDmillis=0;
-
 char trybPracy=T_OFF;
 char trybPracyPop=T_OFF;
 unsigned long kominekMillis=0;
@@ -298,6 +307,9 @@ void loop()
              
               RSpisz(debugTopic,"Watchdog restart");
               delay(3000);
+              //ESP.restart();
+			  // ESP.reset();  // hard reset
+			   //resetFunc();
             //  ESP.restart();
             }
           }
